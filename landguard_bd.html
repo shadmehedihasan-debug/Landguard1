@@ -3,1079 +3,1210 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LandGuard BD (ভূমিগার্ড) - Smart Land Governance Platform</title>
+  <title>LANDGUARD // Autonomous Geospatial & Land Intelligence Terminal</title>
   <style>
     :root {
-      --primary: #0f766e;
-      --primary-dark: #115e59;
-      --primary-light: #ccfbf1;
-      --accent: #f59e0b;
-      --danger: #ef4444;
-      --success: #10b981;
-      --warning: #f59e0b;
-      --bg: #f8fafc;
-      --card-bg: #ffffff;
-      --text: #0f172a;
-      --text-muted: #64748b;
-      --border: #e2e8f0;
-      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+      --bg-space: #030712;
+      --bg-panel: rgba(11, 18, 33, 0.85);
+      --bg-panel-glow: rgba(15, 23, 42, 0.7);
+      --border-hud: rgba(34, 211, 238, 0.25);
+      --border-glow: rgba(56, 189, 248, 0.45);
+      --cyan: #06b6d4;
+      --cyan-bright: #22d3ee;
+      --cyan-glow: rgba(6, 182, 212, 0.35);
+      --emerald: #10b981;
+      --emerald-bright: #34d399;
+      --emerald-glow: rgba(16, 185, 129, 0.35);
+      --amber: #f59e0b;
+      --amber-glow: rgba(245, 158, 11, 0.35);
+      --rose: #f43f5e;
+      --rose-bright: #fb7185;
+      --rose-glow: rgba(244, 63, 94, 0.45);
+      --text-main: #f8fafc;
+      --text-dim: #94a3b8;
+      --text-mono: #67e8f9;
+      --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Consolas, monospace;
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
 
     body {
-      background-color: var(--bg);
-      color: var(--text);
+      background-color: var(--bg-space);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(6, 182, 212, 0.12) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+        radial-gradient(at 50% 100%, rgba(16, 185, 129, 0.08) 0px, transparent 50%),
+        linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
       line-height: 1.5;
-      padding-bottom: 60px;
     }
 
-    /* Top Banner & Header */
-    .top-badge-bar {
-      background: linear-gradient(90deg, #134e4a, #0f766e);
-      color: #e6fffa;
-      padding: 8px 16px;
-      font-size: 0.85rem;
+    /* Ambient Scanline Filter (Subtle HUD feel) */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.15) 1px, transparent 1px, transparent 2px);
+      pointer-events: none;
+      z-index: 999;
+      opacity: 0.4;
+    }
+
+    /* Top Aerospace Header HUD */
+    .telemetry-bar {
+      background: rgba(3, 7, 18, 0.95);
+      border-bottom: 1px solid var(--border-hud);
+      padding: 6px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.8px;
+      color: var(--text-dim);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(12px);
+    }
+
+    .telemetry-group {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .status-node {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .ping-dot {
+      width: 7px;
+      height: 7px;
+      background-color: var(--cyan-bright);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--cyan-bright);
+      animation: pulse-ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
+
+    @keyframes pulse-ping {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.3); }
+    }
+
+    /* Main Terminal Navigation */
+    .terminal-nav {
+      background: var(--bg-panel);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 14px 24px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 16px;
+      backdrop-filter: blur(16px);
     }
 
-    .badge-pill {
-      background: rgba(255, 255, 255, 0.2);
-      padding: 2px 10px;
-      border-radius: 9999px;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-    }
-
-    header {
-      background: var(--card-bg);
-      border-bottom: 1px solid var(--border);
-      padding: 16px 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05);
-    }
-
-    .brand {
+    .brand-hud {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
     }
 
-    .brand-icon {
-      background: var(--primary);
-      color: white;
-      width: 42px;
-      height: 42px;
+    .brand-icon-box {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.3), rgba(16, 185, 129, 0.15));
+      border: 1.5px solid var(--cyan-bright);
+      box-shadow: 0 0 15px var(--cyan-glow), inset 0 0 10px rgba(6, 182, 212, 0.2);
       border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.4rem;
-      font-weight: bold;
+      font-size: 1.3rem;
+      position: relative;
     }
 
-    .brand-title h1 {
-      font-size: 1.35rem;
+    .brand-icon-box::after {
+      content: "";
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: var(--cyan-bright);
+      top: -2px;
+      right: -2px;
+      border-radius: 2px;
+    }
+
+    .brand-meta h1 {
+      font-size: 1.25rem;
       font-weight: 800;
-      color: var(--primary-dark);
-      line-height: 1.2;
-    }
-
-    .brand-title p {
-      font-size: 0.78rem;
-      color: var(--text-muted);
-    }
-
-    /* Tab Navigation */
-    .nav-tabs {
-      display: flex;
-      gap: 6px;
-      background: #f1f5f9;
-      padding: 4px;
-      border-radius: 12px;
-      overflow-x: auto;
-    }
-
-    .tab-btn {
-      padding: 8px 14px;
-      border: none;
-      background: transparent;
-      color: var(--text-muted);
-      border-radius: 8px;
-      font-size: 0.88rem;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      white-space: nowrap;
-      transition: all 0.2s;
-    }
-
-    .tab-btn:hover {
-      color: var(--primary-dark);
-    }
-
-    .tab-btn.active {
-      background: var(--card-bg);
-      color: var(--primary);
-      box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
-    }
-
-    /* Main Container */
-    .main-container {
-      max-width: 1200px;
-      margin: 24px auto;
-      padding: 0 16px;
-    }
-
-    .tab-content {
-      display: none;
-      animation: fadeIn 0.25s ease-in-out;
-    }
-
-    .tab-content.active {
-      display: block;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(4px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* Common Card Styles */
-    .card {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 24px;
-      margin-bottom: 20px;
-      box-shadow: var(--shadow);
-    }
-
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 18px;
-      border-bottom: 1px solid #f1f5f9;
-      padding-bottom: 12px;
-    }
-
-    .card-title h2 {
-      font-size: 1.2rem;
-      font-weight: 700;
-      color: var(--text);
-    }
-
-    .card-title p {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      margin-top: 2px;
-    }
-
-    /* Form Controls */
-    .form-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 14px;
-      margin-bottom: 18px;
-    }
-
-    .form-group label {
-      display: block;
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: var(--text-muted);
-      margin-bottom: 6px;
+      letter-spacing: 1.5px;
+      background: linear-gradient(90deg, #ffffff, #67e8f9, #34d399);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
       text-transform: uppercase;
+    }
+
+    .brand-meta p {
+      font-size: 0.72rem;
+      font-family: var(--font-mono);
+      color: var(--text-dim);
       letter-spacing: 0.5px;
     }
 
-    .form-control {
-      width: 100%;
-      padding: 10px 14px;
-      border: 1.5px solid var(--border);
-      border-radius: 8px;
-      font-size: 0.95rem;
-      color: var(--text);
-      outline: none;
-      transition: border-color 0.2s;
+    /* Sci-Fi Navigation Tabs */
+    .hud-tabs {
+      display: flex;
+      gap: 6px;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 4px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
     }
 
-    .form-control:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.15);
-    }
-
-    .btn {
-      padding: 10px 20px;
-      border: none;
+    .hud-tab-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      padding: 8px 16px;
       border-radius: 8px;
-      font-size: 0.92rem;
-      font-weight: 600;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .hud-tab-btn:hover {
+      color: var(--cyan-bright);
+      background: rgba(6, 182, 212, 0.08);
+      border-color: rgba(6, 182, 212, 0.2);
+    }
+
+    .hud-tab-btn.active {
+      color: #030712;
+      background: var(--cyan-bright);
+      font-weight: 700;
+      border-color: var(--cyan-bright);
+      box-shadow: 0 0 16px var(--cyan-glow);
+    }
+
+    /* Main Container Grid */
+    .terminal-body {
+      max-width: 1400px;
+      margin: 28px auto;
+      padding: 0 20px;
+    }
+
+    .terminal-tab-panel {
+      display: none;
+      animation: hudFade 0.3s ease-out;
+    }
+
+    .terminal-tab-panel.active {
+      display: block;
+    }
+
+    @keyframes hudFade {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Aerospace HUD Card System */
+    .hud-card {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-hud);
+      border-radius: 16px;
+      padding: 24px;
+      position: relative;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(6, 182, 212, 0.03);
+      backdrop-filter: blur(20px);
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+
+    /* Futuristic Corner Brackets */
+    .hud-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 18px;
+      height: 18px;
+      border-top: 2px solid var(--cyan-bright);
+      border-left: 2px solid var(--cyan-bright);
+      border-top-left-radius: 12px;
+      pointer-events: none;
+    }
+
+    .hud-card::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 18px;
+      height: 18px;
+      border-bottom: 2px solid var(--cyan-bright);
+      border-right: 2px solid var(--cyan-bright);
+      border-bottom-right-radius: 12px;
+      pointer-events: none;
+    }
+
+    .hud-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 22px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      padding-bottom: 14px;
+    }
+
+    .hud-header-title h2 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .hud-header-title p {
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+      margin-top: 4px;
+    }
+
+    /* Cyber Form Controls */
+    .hud-grid-4 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .hud-field label {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--cyan-bright);
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .hud-input, .hud-select {
+      width: 100%;
+      background: rgba(3, 7, 18, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: #ffffff;
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .hud-input:focus, .hud-select:focus {
+      border-color: var(--cyan-bright);
+      box-shadow: 0 0 12px var(--cyan-glow);
+      background: rgba(6, 182, 212, 0.05);
+    }
+
+    /* Buttons */
+    .hud-btn {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 11px 22px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 700;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
       transition: all 0.2s;
+      border: 1px solid transparent;
     }
 
-    .btn-primary {
-      background: var(--primary);
-      color: white;
+    .hud-btn-primary {
+      background: linear-gradient(135deg, #06b6d4, #0891b2);
+      color: #030712;
+      box-shadow: 0 0 20px var(--cyan-glow);
     }
 
-    .btn-primary:hover {
-      background: var(--primary-dark);
+    .hud-btn-primary:hover {
+      background: linear-gradient(135deg, #22d3ee, #06b6d4);
+      transform: translateY(-1px);
+      box-shadow: 0 0 28px rgba(6, 182, 212, 0.6);
     }
 
-    .btn-secondary {
-      background: #f1f5f9;
-      color: var(--text);
+    .hud-btn-outline {
+      background: rgba(255, 255, 255, 0.03);
+      border-color: rgba(255, 255, 255, 0.15);
+      color: var(--text-main);
     }
 
-    .btn-secondary:hover {
-      background: #e2e8f0;
+    .hud-btn-outline:hover {
+      border-color: var(--cyan-bright);
+      color: var(--cyan-bright);
+      background: rgba(6, 182, 212, 0.06);
     }
 
-    .btn-danger {
-      background: #fee2e2;
-      color: var(--danger);
-      border: 1px solid #fca5a5;
+    .hud-btn-danger {
+      background: rgba(244, 63, 94, 0.15);
+      border-color: var(--rose);
+      color: var(--rose-bright);
+      box-shadow: 0 0 16px var(--rose-glow);
     }
 
-    /* Sample Selector Pill */
-    .sample-chips {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-top: 10px;
-      font-size: 0.85rem;
-      color: var(--text-muted);
+    .hud-btn-danger:hover {
+      background: var(--rose);
+      color: #ffffff;
     }
 
-    .chip {
-      background: #f1f5f9;
-      border: 1px solid var(--border);
-      padding: 4px 12px;
-      border-radius: 9999px;
+    /* Chip Pills */
+    .hud-chip {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      color: var(--text-dim);
       cursor: pointer;
       transition: all 0.15s;
-      font-weight: 500;
     }
 
-    .chip:hover {
-      background: var(--primary-light);
-      color: var(--primary-dark);
-      border-color: var(--primary);
+    .hud-chip:hover {
+      border-color: var(--cyan-bright);
+      color: var(--cyan-bright);
+      background: rgba(6, 182, 212, 0.1);
     }
 
-    /* Safety Score Gauge Display */
-    .score-layout {
+    /* Holographic Radial Gauge */
+    .gauge-cockpit {
       display: grid;
-      grid-template-columns: 280px 1fr;
-      gap: 24px;
+      grid-template-columns: 320px 1fr;
+      gap: 28px;
       align-items: center;
-      background: #f8fafc;
-      padding: 20px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
+      background: rgba(3, 7, 18, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 14px;
+      padding: 24px;
     }
 
-    @media (max-width: 768px) {
-      .score-layout {
+    @media (max-width: 900px) {
+      .gauge-cockpit {
         grid-template-columns: 1fr;
       }
     }
 
-    .gauge-wrapper {
+    .gauge-core {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      text-align: center;
+      position: relative;
     }
 
-    .gauge-svg {
-      width: 170px;
-      height: 170px;
+    .gauge-svg-ring {
+      width: 210px;
+      height: 210px;
       transform: rotate(-90deg);
     }
 
-    .gauge-bg {
+    .ring-track {
       fill: none;
-      stroke: #e2e8f0;
-      stroke-width: 14;
+      stroke: rgba(255, 255, 255, 0.05);
+      stroke-width: 12;
     }
 
-    .gauge-progress {
+    .ring-bar {
       fill: none;
-      stroke-width: 14;
+      stroke: var(--emerald-bright);
+      stroke-width: 12;
       stroke-linecap: round;
-      stroke-dasharray: 440;
-      stroke-dashoffset: 440;
-      transition: stroke-dashoffset 1s ease-in-out, stroke 0.4s;
+      stroke-dasharray: 565;
+      stroke-dashoffset: 565;
+      transition: stroke-dashoffset 1.2s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.4s;
+      filter: drop-shadow(0 0 10px var(--emerald-glow));
     }
 
-    .gauge-text {
+    .gauge-data-center {
       position: absolute;
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
     }
 
-    .gauge-number {
-      font-size: 2.4rem;
+    .gauge-number-big {
+      font-size: 3.2rem;
       font-weight: 800;
+      font-family: var(--font-mono);
       line-height: 1;
+      color: #ffffff;
+      text-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
     }
 
-    .gauge-label {
-      font-size: 0.8rem;
-      text-transform: uppercase;
+    .gauge-state-badge {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
       font-weight: 700;
-      margin-top: 4px;
+      letter-spacing: 1.5px;
+      margin-top: 6px;
+      padding: 2px 10px;
+      border-radius: 4px;
     }
 
-    .metrics-list {
+    /* Telemetry Diagnostics Rows */
+    .diagnostics-stack {
       display: flex;
       flex-direction: column;
       gap: 12px;
     }
 
-    .metric-row {
+    .diagnostic-item {
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      padding: 10px 14px;
-      background: white;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-    }
-
-    .metric-info {
-      display: flex;
       align-items: center;
-      gap: 10px;
-      font-size: 0.9rem;
-      font-weight: 500;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 10px;
+      padding: 12px 18px;
     }
 
-    .status-badge {
-      padding: 3px 10px;
-      border-radius: 9999px;
-      font-size: 0.78rem;
+    .diag-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #ffffff;
+    }
+
+    .diag-sub {
+      font-size: 0.72rem;
+      font-family: var(--font-mono);
+      color: var(--text-dim);
+    }
+
+    .hud-badge {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
       font-weight: 700;
+      letter-spacing: 1px;
+      padding: 4px 10px;
+      border-radius: 4px;
       text-transform: uppercase;
     }
 
-    .status-safe {
-      background: #dcfce7;
-      color: #15803d;
+    .hud-badge-green {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--emerald-bright);
+      border: 1px solid var(--emerald);
+      box-shadow: 0 0 10px var(--emerald-glow);
     }
 
-    .status-warning {
-      background: #fef3c7;
-      color: #b45309;
+    .hud-badge-amber {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--amber);
+      border: 1px solid var(--amber);
+      box-shadow: 0 0 10px var(--amber-glow);
     }
 
-    .status-danger {
-      background: #fee2e2;
-      color: #b91c1c;
+    .hud-badge-rose {
+      background: rgba(244, 63, 94, 0.15);
+      color: var(--rose-bright);
+      border: 1px solid var(--rose);
+      box-shadow: 0 0 10px var(--rose-glow);
     }
 
-    /* Voice Bot Layout */
-    .bot-container {
+    /* MODULE 2: VOICE HUD & WAVEFORM */
+    .voice-cockpit {
       display: grid;
-      grid-template-columns: 1fr 340px;
-      gap: 20px;
+      grid-template-columns: 1fr 360px;
+      gap: 24px;
     }
 
-    @media (max-width: 860px) {
-      .bot-container {
+    @media (max-width: 960px) {
+      .voice-cockpit {
         grid-template-columns: 1fr;
       }
     }
 
-    .chat-window {
-      background: #f8fafc;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      height: 440px;
+    .voice-terminal-screen {
+      background: rgba(3, 7, 18, 0.8);
+      border: 1px solid var(--border-hud);
+      border-radius: 14px;
+      height: 480px;
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.8);
     }
 
-    .chat-messages {
+    .voice-feed {
       flex: 1;
-      padding: 16px;
+      padding: 20px;
       overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .chat-msg {
-      max-width: 80%;
-      padding: 12px 16px;
-      border-radius: 12px;
-      font-size: 0.92rem;
-      line-height: 1.4;
-    }
-
-    .chat-msg.bot {
-      background: white;
-      border: 1px solid var(--border);
-      align-self: flex-start;
-      border-bottom-left-radius: 2px;
-    }
-
-    .chat-msg.user {
-      background: var(--primary);
-      color: white;
-      align-self: flex-end;
-      border-bottom-right-radius: 2px;
-    }
-
-    .chat-input-bar {
-      padding: 12px;
-      background: white;
-      border-top: 1px solid var(--border);
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
-
-    .mic-button {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      background: var(--primary);
-      color: white;
-      border: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.2rem;
-      cursor: pointer;
-      transition: all 0.2s;
-      flex-shrink: 0;
-    }
-
-    .mic-button.listening {
-      background: var(--danger);
-      animation: pulse 1.2s infinite;
-    }
-
-    @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6); }
-      70% { box-shadow: 0 0 0 16px rgba(239, 68, 68, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
-    }
-
-    .guidance-panel {
-      background: white;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 18px;
       display: flex;
       flex-direction: column;
       gap: 14px;
     }
 
-    .guidance-panel h3 {
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--primary-dark);
+    .voice-msg {
+      max-width: 82%;
+      padding: 14px 18px;
+      border-radius: 12px;
+      font-size: 0.88rem;
+      line-height: 1.5;
     }
 
-    .quick-query-btn {
-      text-align: left;
-      background: #f8fafc;
-      border: 1px solid var(--border);
-      padding: 10px 12px;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      cursor: pointer;
-      color: var(--text);
-      transition: all 0.15s;
+    .voice-msg.ai {
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(34, 211, 238, 0.25);
+      color: #e2e8f0;
+      align-self: flex-start;
+      border-top-left-radius: 2px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     }
 
-    .quick-query-btn:hover {
-      background: var(--primary-light);
-      border-color: var(--primary);
-      color: var(--primary-dark);
+    .voice-msg.user {
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.3), rgba(8, 145, 178, 0.4));
+      border: 1px solid var(--cyan);
+      color: #ffffff;
+      align-self: flex-end;
+      border-top-right-radius: 2px;
     }
 
-    /* Map & Boundary Module */
-    .map-controls {
+    /* Audio Waveform Animation */
+    .waveform-visualizer {
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      background: rgba(0, 0, 0, 0.4);
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 0 16px;
+    }
+
+    .wave-bar {
+      width: 4px;
+      height: 8px;
+      background: var(--cyan);
+      border-radius: 2px;
+      transition: height 0.1s;
+    }
+
+    .waveform-active .wave-bar {
+      animation: wavePulse 0.8s ease-in-out infinite alternate;
+    }
+
+    .wave-bar:nth-child(2) { animation-delay: 0.1s; }
+    .wave-bar:nth-child(3) { animation-delay: 0.2s; }
+    .wave-bar:nth-child(4) { animation-delay: 0.3s; }
+    .wave-bar:nth-child(5) { animation-delay: 0.4s; }
+    .wave-bar:nth-child(6) { animation-delay: 0.5s; }
+    .wave-bar:nth-child(7) { animation-delay: 0.2s; }
+    .wave-bar:nth-child(8) { animation-delay: 0.4s; }
+
+    @keyframes wavePulse {
+      0% { height: 6px; background: var(--cyan); }
+      100% { height: 28px; background: var(--emerald-bright); box-shadow: 0 0 10px var(--emerald-glow); }
+    }
+
+    .voice-input-strip {
+      padding: 14px;
+      background: rgba(11, 18, 33, 0.9);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
       display: flex;
       gap: 12px;
-      margin-bottom: 14px;
-      flex-wrap: wrap;
       align-items: center;
-      justify-content: space-between;
     }
 
-    .map-container {
+    .cyber-mic-btn {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #06b6d4, #0891b2);
+      border: 2px solid var(--cyan-bright);
+      color: #030712;
+      font-size: 1.4rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 20px var(--cyan-glow);
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+
+    .cyber-mic-btn.active-pulse {
+      background: var(--rose);
+      border-color: var(--rose-bright);
+      color: #ffffff;
+      animation: micSonar 1.5s infinite;
+    }
+
+    @keyframes micSonar {
+      0% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.8); }
+      70% { box-shadow: 0 0 0 20px rgba(244, 63, 94, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); }
+    }
+
+    /* MODULE 3: TACTICAL MOUZA RADAR */
+    .tactical-viewport {
+      height: 520px;
+      background: #020617;
+      border: 1px solid var(--border-hud);
+      border-radius: 14px;
       position: relative;
-      background: #e2e8f0;
-      border-radius: 12px;
-      border: 2px solid var(--border);
-      height: 480px;
       overflow: hidden;
+      box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.9);
     }
 
-    .map-svg {
+    .tactical-grid-overlay {
+      position: absolute;
+      inset: 0;
+      background-image: 
+        radial-gradient(circle at center, rgba(6, 182, 212, 0.15) 0%, transparent 70%),
+        linear-gradient(rgba(34, 211, 238, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(34, 211, 238, 0.05) 1px, transparent 1px);
+      background-size: 100% 100%, 50px 50px, 50px 50px;
+      pointer-events: none;
+    }
+
+    .radar-sweep-beam {
+      position: absolute;
       width: 100%;
-      height: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--cyan-bright), transparent);
+      box-shadow: 0 0 15px var(--cyan-bright);
+      top: 0;
+      animation: radarScan 4s linear infinite;
+      pointer-events: none;
+      opacity: 0.6;
     }
 
-    .plot-polygon {
-      fill: rgba(15, 118, 110, 0.15);
-      stroke: #0f766e;
+    @keyframes radarScan {
+      0% { top: 0%; opacity: 0; }
+      10% { opacity: 0.8; }
+      90% { opacity: 0.8; }
+      100% { top: 100%; opacity: 0; }
+    }
+
+    .hud-crosshair {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--cyan-bright);
+      background: rgba(3, 7, 18, 0.85);
+      border: 1px solid var(--border-hud);
+      padding: 10px 14px;
+      border-radius: 8px;
+      pointer-events: none;
+      letter-spacing: 0.8px;
+    }
+
+    .cadastral-plot {
+      fill: rgba(6, 182, 212, 0.12);
+      stroke: var(--cyan);
       stroke-width: 2;
       cursor: pointer;
       transition: all 0.2s;
     }
 
-    .plot-polygon:hover {
-      fill: rgba(15, 118, 110, 0.4);
+    .cadastral-plot:hover {
+      fill: rgba(6, 182, 212, 0.35);
+      stroke: var(--cyan-bright);
       stroke-width: 3;
     }
 
-    .plot-polygon.selected {
-      fill: rgba(245, 158, 11, 0.35);
-      stroke: #d97706;
+    .cadastral-plot.locked-target {
+      fill: rgba(245, 158, 11, 0.25);
+      stroke: var(--amber);
       stroke-width: 3.5;
     }
 
-    .plot-overlap {
-      fill: rgba(239, 68, 68, 0.4) !important;
-      stroke: #dc2626 !important;
-      stroke-dasharray: 5,5;
-      animation: dash 1s linear infinite;
+    .cadastral-plot.breach-alert {
+      fill: rgba(244, 63, 94, 0.35) !important;
+      stroke: var(--rose-bright) !important;
+      stroke-dasharray: 6,4;
+      animation: breachBlink 0.8s infinite;
     }
 
-    @keyframes dash {
-      to { stroke-dashoffset: -10; }
+    @keyframes breachBlink {
+      50% { fill: rgba(244, 63, 94, 0.65); stroke-width: 4; }
     }
 
-    .map-overlay-card {
-      position: absolute;
-      bottom: 16px;
-      left: 16px;
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(8px);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 14px;
-      box-shadow: var(--shadow-lg);
-      max-width: 300px;
-      font-size: 0.85rem;
-    }
-
-    /* Sentinel Module (Slider & Camera) */
-    .sentinel-grid {
+    /* MODULE 4: SENTINEL VISION DRONE FEED */
+    .sentinel-dual {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 24px;
     }
 
-    @media (max-width: 860px) {
-      .sentinel-grid {
+    @media (max-width: 960px) {
+      .sentinel-dual {
         grid-template-columns: 1fr;
       }
     }
 
-    .sentinel-feed {
+    .drone-camera-box {
       position: relative;
-      background: #000;
-      border-radius: 12px;
-      height: 340px;
+      background: #000000;
+      border: 1px solid var(--border-hud);
+      border-radius: 14px;
+      height: 380px;
       overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: white;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
     }
 
-    .feed-overlay {
+    .hud-rec-indicator {
       position: absolute;
-      top: 12px;
-      left: 12px;
+      top: 14px;
+      left: 16px;
       display: flex;
       align-items: center;
-      gap: 8px;
-      background: rgba(0, 0, 0, 0.6);
-      padding: 4px 10px;
+      gap: 10px;
+      background: rgba(3, 7, 18, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 6px 12px;
       border-radius: 6px;
-      font-size: 0.75rem;
-      font-family: monospace;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.8px;
     }
 
-    .rec-dot {
-      width: 8px;
-      height: 8px;
-      background: #ef4444;
-      border-radius: 50%;
-      animation: blink 1s infinite;
-    }
-
-    @keyframes blink {
-      50% { opacity: 0; }
-    }
-
-    .bbox {
+    .ai-target-box {
       position: absolute;
-      border: 2px solid #ef4444;
-      background: rgba(239, 68, 68, 0.15);
+      border: 2px solid var(--rose-bright);
+      background: rgba(244, 63, 94, 0.15);
       border-radius: 4px;
-      pointer-events: none;
+      box-shadow: 0 0 15px var(--rose-glow);
     }
 
-    .bbox-label {
+    .ai-target-tag {
       position: absolute;
-      top: -22px;
+      top: -24px;
       left: -2px;
-      background: #ef4444;
-      color: white;
-      font-size: 0.7rem;
+      background: var(--rose);
+      color: #ffffff;
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
       font-weight: 700;
-      padding: 2px 6px;
+      padding: 2px 8px;
       border-radius: 3px;
       white-space: nowrap;
+      letter-spacing: 0.5px;
     }
 
-    .alert-log-list {
+    /* Cyber Audit Stream Logs */
+    .audit-terminal-log {
       display: flex;
       flex-direction: column;
       gap: 10px;
-      max-height: 280px;
+      max-height: 320px;
       overflow-y: auto;
     }
 
-    .alert-item {
-      padding: 10px 14px;
+    .audit-log-row {
+      background: rgba(3, 7, 18, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-left: 4px solid var(--rose);
       border-radius: 8px;
-      border-left: 4px solid var(--danger);
-      background: #fef2f2;
-      font-size: 0.85rem;
+      padding: 12px 14px;
+      font-size: 0.82rem;
     }
 
-    .alert-meta {
-      display: flex;
-      justify-content: space-between;
-      color: var(--text-muted);
-      font-size: 0.75rem;
-      margin-top: 4px;
+    .audit-log-row.resolved {
+      border-left-color: var(--emerald-bright);
     }
 
-    /* Modal */
-    .modal-backdrop {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(15, 23, 42, 0.6);
-      z-index: 100;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-    }
-
-    .modal-backdrop.show {
-      display: flex;
-    }
-
-    .modal-box {
-      background: white;
-      border-radius: 14px;
-      max-width: 600px;
-      width: 100%;
-      padding: 24px;
-      box-shadow: var(--shadow-lg);
+    .audit-log-row.warning {
+      border-left-color: var(--amber);
     }
   </style>
 </head>
 <body>
 
-  <!-- Top Competition Badge -->
-  <div class="top-badge-bar">
-    <div style="display: flex; align-items: center; gap: 8px;">
-      <span class="badge-pill">DIU LANDTECH 2026</span>
-      <span>Track: <strong>Land Tech Software</strong></span>
+  <!-- Top Aerospace Telemetry Bar -->
+  <div class="telemetry-bar">
+    <div class="telemetry-group">
+      <span class="status-node"><span class="ping-dot"></span> ORBITAL SENTINEL: ONLINE</span>
+      <span>SYS_BUILD: <strong>v4.2.1-PROD</strong></span>
+      <span>NODE: <strong>DHAKA-SAVAR // JL-42</strong></span>
     </div>
-    <div style="display: flex; align-items: center; gap: 12px;">
-      <span>Team: <strong>BUG X HUNTER</strong> (Code: <code>LA-193</code>)</span>
-      <span class="badge-pill">Savvy E-Governance MVP</span>
+    <div class="telemetry-group">
+      <span>DIU LANDTECH 2026 // TRACK: <strong>LAND TECH SOFTWARE</strong></span>
+      <span style="color: var(--cyan-bright); font-weight: 700;">TEAM: BUG X HUNTER [LA-193]</span>
     </div>
   </div>
 
-  <!-- Header & Navigation -->
-  <header>
-    <div class="brand">
-      <div class="brand-icon">🛡️</div>
-      <div class="brand-title">
-        <h1>LandGuard BD (ভূমিগার্ড)</h1>
-        <p>Smart Land Governance & Anti-Fraud Citizen Platform</p>
+  <!-- Primary Navigation Header -->
+  <header class="terminal-nav">
+    <div class="brand-hud">
+      <div class="brand-icon-box">🛡️</div>
+      <div class="brand-meta">
+        <h1>LANDGUARD // INTELLIGENCE CONSOLE</h1>
+        <p>AUTONOMOUS CADASTRAL FORENSICS &amp; SATELLITE ANTI-ENCROACHMENT SYSTEM</p>
       </div>
     </div>
 
-    <nav class="nav-tabs">
-      <button class="tab-btn active" onclick="switchTab('score')">🛡️ Safety Score</button>
-      <button class="tab-btn" onclick="switchTab('voice')">🎙️ Gramin AI</button>
-      <button class="tab-btn" onclick="switchTab('map')">📍 Mouza Map</button>
-      <button class="tab-btn" onclick="switchTab('sentinel')">🛰️ Sentinel</button>
-      <button class="tab-btn" onclick="switchTab('locker')">📋 Citizen Locker</button>
+    <nav class="hud-tabs">
+      <button class="hud-tab-btn active" onclick="activateHudTab('score')">🛡️ Safety Meter</button>
+      <button class="hud-tab-btn" onclick="activateHudTab('voice')">🎙️ Gramin AI</button>
+      <button class="hud-tab-btn" onclick="activateHudTab('map')">📍 Mouza Radar</button>
+      <button class="hud-tab-btn" onclick="activateHudTab('sentinel')">🛰️ Drone Sentinel</button>
+      <button class="hud-tab-btn" onclick="activateHudTab('vault')">🔐 Citizen Vault</button>
     </nav>
   </header>
 
-  <!-- Main Application Body -->
-  <main class="main-container">
+  <!-- Main Workspace -->
+  <main class="terminal-body">
 
-    <!-- TAB 1: LAND SAFETY SCORE -->
-    <section id="tab-score" class="tab-content active">
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">
-            <h2>Pre-Purchase Land Safety Meter (ভূমি নিরাপত্তা যাচাই)</h2>
-            <p>Verify ownership chain, court litigation, mutation status, and zoning buffer before transactions.</p>
+    <!-- MODULE 1: FORENSIC LAND SAFETY METER -->
+    <section id="panel-score" class="terminal-tab-panel active">
+      <div class="hud-card">
+        <div class="hud-card-header">
+          <div class="hud-header-title">
+            <h2>🛡️ Autonomous Land Risk &amp; Integrity Engine (ভূমি ঝুঁকি মূল্যায়ন)</h2>
+            <p>Automated forensic correlation across historical Khatians (CS-SA-RS-BS), court injunctions, and canal reserves.</p>
           </div>
-          <button class="btn btn-secondary" onclick="resetScoreForm()">Clear Form</button>
+          <button class="hud-btn hud-btn-outline" onclick="resetHudForm()">Clear Buffer</button>
         </div>
 
-        <div class="form-grid">
-          <div class="form-group">
-            <label>Division</label>
-            <select class="form-control" id="score-division">
-              <option value="Dhaka">Dhaka (ঢাকা)</option>
-              <option value="Chattogram">Chattogram</option>
-              <option value="Rajshahi">Rajshahi</option>
+        <div class="hud-grid-4">
+          <div class="hud-field">
+            <label>Geographic Division</label>
+            <select class="hud-select" id="input-division">
+              <option value="Dhaka">Dhaka Central Division (ঢাকা)</option>
+              <option value="Chattogram">Chattogram Coastal</option>
+              <option value="Rajshahi">Rajshahi North</option>
             </select>
           </div>
-          <div class="form-group">
-            <label>District / Upazila</label>
-            <input type="text" class="form-control" id="score-district" value="Dhaka / Savar">
+          <div class="hud-field">
+            <label>Upazila / Circle</label>
+            <input type="text" class="hud-input" id="input-upazila" value="Dhaka / Savar Upazila">
           </div>
-          <div class="form-group">
-            <label>Mouza Name</label>
-            <input type="text" class="form-control" id="score-mouza" value="Baipail (JL-42)">
+          <div class="hud-field">
+            <label>Cadastral Mouza</label>
+            <input type="text" class="hud-input" id="input-mouza" value="Baipail (JL #42, Sheet 4)">
           </div>
-          <div class="form-group">
-            <label>Daag (Plot) No.</label>
-            <input type="number" class="form-control" id="score-daag" value="402">
+          <div class="hud-field">
+            <label>Target Daag (Plot No.)</label>
+            <input type="number" class="hud-input" id="input-daag" value="402">
           </div>
-          <div class="form-group">
-            <label>Khatian No.</label>
-            <input type="number" class="form-control" id="score-khatian" value="194">
-          </div>
-        </div>
-
-        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-          <button class="btn btn-primary" onclick="calculateScore()">🔍 Run Deep Land Audit</button>
-          <div class="sample-chips">
-            <span>Quick Sample Plots:</span>
-            <span class="chip" onclick="loadSamplePlot(402, 194, 94, 'safe')">Plot 402 (Clean 94)</span>
-            <span class="chip" onclick="loadSamplePlot(108, 312, 62, 'warning')">Plot 108 (Caution 62)</span>
-            <span class="chip" onclick="loadSamplePlot(77, 88, 28, 'danger')">Plot 77 (High Risk 28)</span>
+          <div class="hud-field">
+            <label>Registered Khatian No.</label>
+            <input type="number" class="hud-input" id="input-khatian" value="194">
           </div>
         </div>
 
-        <!-- Score Results Section -->
-        <div style="margin-top: 24px;" id="score-result-container">
-          <div class="score-layout">
-            <div class="gauge-wrapper">
-              <div style="position: relative; display: flex; align-items: center; justify-content: center;">
-                <svg class="gauge-svg" viewBox="0 0 160 160">
-                  <circle class="gauge-bg" cx="80" cy="80" r="70"></circle>
-                  <circle class="gauge-progress" id="gauge-circle" cx="80" cy="80" r="70"></circle>
-                </svg>
-                <div class="gauge-text">
-                  <span class="gauge-number" id="gauge-value">94</span>
-                  <span class="gauge-label" id="gauge-status-text" style="color: #10b981;">SAFE TO BUY</span>
-                </div>
-              </div>
-              <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 10px;">Audit ID: LG-DH-2026-402</p>
-            </div>
+        <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 24px;">
+          <button class="hud-btn hud-btn-primary" onclick="executeForensicAudit()">⚡ Execute Forensic Audit</button>
+          <div style="display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 0.76rem; color: var(--text-dim);">
+            <span>Preset Target Scenarios:</span>
+            <span class="hud-chip" onclick="loadTelemetryScenario(402, 194, 94, 'safe')">Plot 402 (Clean 94)</span>
+            <span class="hud-chip" onclick="loadTelemetryScenario(108, 312, 62, 'caution')">Plot 108 (Caution 62)</span>
+            <span class="hud-chip" onclick="loadTelemetryScenario(77, 88, 28, 'critical')">Plot 77 (Critical 28)</span>
+          </div>
+        </div>
 
-            <div class="metrics-list">
-              <div class="metric-row">
-                <div class="metric-info">
-                  <span>📜</span>
-                  <div>
-                    <div>Chain of Title Continuity (CS → SA → RS → BS)</div>
-                    <small style="color: var(--text-muted);" id="metric-chain-desc">Complete legal pedigree registered.</small>
-                  </div>
-                </div>
-                <span class="status-badge status-safe" id="badge-chain">VERIFIED</span>
-              </div>
-
-              <div class="metric-row">
-                <div class="metric-info">
-                  <span>⚖️</span>
-                  <div>
-                    <div>Civil Court Litigation & Injunction Search</div>
-                    <small style="color: var(--text-muted);" id="metric-court-desc">Zero stay orders or pending title suits.</small>
-                  </div>
-                </div>
-                <span class="status-badge status-safe" id="badge-court">CLEAR</span>
-              </div>
-
-              <div class="metric-row">
-                <div class="metric-info">
-                  <span>💵</span>
-                  <div>
-                    <div>Land Tax (Khajna) Clearance</div>
-                    <small style="color: var(--text-muted);" id="metric-tax-desc">Paid up to current fiscal year (1432 BS).</small>
-                  </div>
-                </div>
-                <span class="status-badge status-safe" id="badge-tax">UP TO DATE</span>
-              </div>
-
-              <div class="metric-row">
-                <div class="metric-info">
-                  <span>🚧</span>
-                  <div>
-                    <div>Government Masterplan & Wetland Buffer</div>
-                    <small style="color: var(--text-muted);" id="metric-buffer-desc">Not inside RAJUK canal or highway zone.</small>
-                  </div>
-                </div>
-                <span class="status-badge status-safe" id="badge-buffer">PERMITTED</span>
+        <!-- Holographic Cockpit Gauge Display -->
+        <div class="gauge-cockpit">
+          <div class="gauge-core">
+            <div style="position: relative; display: flex; align-items: center; justify-content: center;">
+              <svg class="gauge-svg-ring" viewBox="0 0 200 200">
+                <circle class="ring-track" cx="100" cy="100" r="90"></circle>
+                <circle class="ring-bar" id="hud-gauge-bar" cx="100" cy="100" r="90"></circle>
+              </svg>
+              <div class="gauge-data-center">
+                <span class="gauge-number-big" id="hud-score-display">94</span>
+                <span class="gauge-state-badge" id="hud-status-badge" style="background: rgba(16, 185, 129, 0.15); color: var(--emerald-bright); border: 1px solid var(--emerald);">SAFE // VERIFIED</span>
               </div>
             </div>
+            <p style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-dim); margin-top: 12px;">HASH: <span id="telemetry-hash" style="color: var(--cyan-bright);">0x8f2a...c941</span></p>
           </div>
 
-          <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
-            <button class="btn btn-secondary" onclick="alert('Downloading Certified PDF Land Verification Sheet for Daag #' + document.getElementById('score-daag').value)">📄 Download Certified Audit PDF</button>
+          <div class="diagnostics-stack">
+            <div class="diagnostic-item">
+              <div>
+                <div class="diag-label">Historical Khatian Lineage (CS ➔ SA ➔ RS ➔ BS)</div>
+                <div class="diag-sub" id="diag-khatian-sub">Continuous lineage verified across 4 official cadastral surveys.</div>
+              </div>
+              <span class="hud-badge hud-badge-green" id="badge-diag-lineage">VERIFIED 100%</span>
+            </div>
+
+            <div class="diagnostic-item">
+              <div>
+                <div class="diag-label">Civil Court Injunction &amp; Title Suit Intercept</div>
+                <div class="diag-sub" id="diag-court-sub">Zero active stays, caveats, or lis pendens recorded.</div>
+              </div>
+              <span class="hud-badge hud-badge-green" id="badge-diag-court">CLEAR</span>
+            </div>
+
+            <div class="diagnostic-item">
+              <div>
+                <div class="diag-label">Land Development Tax (Khajna) Ledger</div>
+                <div class="diag-sub" id="diag-tax-sub">Dakhila paid through 1432 BS (Govt Treasury #894210).</div>
+              </div>
+              <span class="hud-badge hud-badge-green" id="badge-diag-tax">CLEARED</span>
+            </div>
+
+            <div class="diagnostic-item">
+              <div>
+                <div class="diag-label">Hydrological Wetland &amp; Canal Reserve Buffer</div>
+                <div class="diag-sub" id="diag-buffer-sub">Compliant: Plot located 185m outside gazetted Turag flow zone.</div>
+              </div>
+              <span class="hud-badge hud-badge-green" id="badge-diag-buffer">COMPLIANT</span>
+            </div>
           </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
+          <button class="hud-btn hud-btn-outline" onclick="playBeep(); alert('Exporting Certified Forensic Land Title Dossier [PDF Hash Verification Protocol]...')">📄 Export Cryptographic Audit PDF</button>
         </div>
       </div>
     </section>
 
-    <!-- TAB 2: GRAMIN LAND AI (VOICE BOT) -->
-    <section id="tab-voice" class="tab-content">
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">
-            <h2>Gramin Land AI (গ্রামীণ ল্যান্ড ভয়েস সহকারী)</h2>
-            <p>Voice-assisted land counseling for rural citizens and farmers to prevent middleman exploitation.</p>
+    <!-- MODULE 2: GRAMIN LAND AI VOICE COCKPIT -->
+    <section id="panel-voice" class="terminal-tab-panel">
+      <div class="hud-card">
+        <div class="hud-card-header">
+          <div class="hud-header-title">
+            <h2>🎙️ Gramin Land AI // Cyber-Acoustic Voice Terminal</h2>
+            <p>Conversational Bangla voice synthesis &amp; natural language counseling for rural land rights.</p>
           </div>
-          <span class="status-badge status-safe">🎙️ Audio Engine Ready</span>
+          <span class="hud-badge hud-badge-green">ACOUSTIC CORE: READY</span>
         </div>
 
-        <div class="bot-container">
-          <div class="chat-window">
-            <div class="chat-messages" id="chat-stream">
-              <div class="chat-msg bot">
-                👋 <strong>আসসালামু আলাইকুম!</strong> আমি LandGuard এর গ্রামীণ সহকারী। আপনার জমি, নামজারি (Mutation), সরকারি ফি বা খতিয়ান সংক্রান্ত যেকোনো প্রশ্ন মুখে বলুন বা নিচের অপশনগুলো থেকে বেছে নিন।
+        <div class="voice-cockpit">
+          <div class="voice-terminal-screen">
+            <div class="voice-feed" id="voice-chat-feed">
+              <div class="voice-msg ai">
+                🛡️ <strong>কমান্ড সেন্টার প্রস্তুত।</strong> আমি LandGuard গ্রামীন এআই সহকারী। নামজারি (Mutation), সরকারি ফি, বা খতিয়ানের যে কোনো প্রশ্ন মুখে বলুন অথবা নিচের বাটন চাপুন।
               </div>
             </div>
 
-            <div class="chat-input-bar">
-              <button class="mic-button" id="mic-trigger" onclick="toggleSpeech()" title="Click to Speak">🎙️</button>
-              <input type="text" class="form-control" id="chat-text-input" placeholder="মুখে বলুন অথবা এখানে লিখুন (বাংলা/English)..." onkeydown="if(event.key==='Enter') sendUserMessage()">
-              <button class="btn btn-primary" onclick="sendUserMessage()">পাঠান</button>
+            <!-- Animated Frequency Bars -->
+            <div class="waveform-visualizer" id="wave-container">
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+            </div>
+
+            <div class="voice-input-strip">
+              <button class="cyber-mic-btn" id="cyber-mic" onclick="toggleCyberVoice()" title="Tap to Speak Bangla">🎙️</button>
+              <input type="text" class="hud-input" id="voice-text-prompt" placeholder="মুখে বলুন অথবা টাইপ করুন (বাংলা / English)..." onkeydown="if(event.key==='Enter') submitVoiceCommand()">
+              <button class="hud-btn hud-btn-primary" onclick="submitVoiceCommand()">TRANSMIT</button>
             </div>
           </div>
 
-          <div class="guidance-panel">
-            <h3>জনপ্রিয় সাধারণ প্রশ্নসমূহ</h3>
-            <button class="quick-query-btn" onclick="askQuickQuery('নামজারি করতে সরকারি ফি কত?')">
+          <!-- Quick Query Matrix -->
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--cyan-bright); text-transform: uppercase;">⚡ Quick Voice Commands:</div>
+            
+            <button class="hud-btn hud-btn-outline" style="text-align: left; justify-content: flex-start;" onclick="runQuickVoiceCommand('নামজারি করতে সরকারি ফি কত?')">
               💰 নামজারি করতে সরকারি ফি কত?
             </button>
-            <button class="quick-query-btn" onclick="askQuickQuery('ওয়ারিশ সূত্রে জমি ভাগ করার নিয়ম কী?')">
+            <button class="hud-btn hud-btn-outline" style="text-align: left; justify-content: flex-start;" onclick="runQuickVoiceCommand('ওয়ারিশ সূত্রে জমি ভাগ করার নিয়ম কী?')">
               👨‍👩‍👧‍👦 ওয়ারিশ সূত্রে জমি ভাগ করার নিয়ম কী?
             </button>
-            <button class="quick-query-btn" onclick="askQuickQuery('জমি কেনার আগে কোন কোন কাগজ দেখতে হবে?')">
+            <button class="hud-btn hud-btn-outline" style="text-align: left; justify-content: flex-start;" onclick="runQuickVoiceCommand('জমি কেনার আগে কোন কাগজ দেখতে হবে?')">
               📑 জমি কেনার আগে কোন কাগজ দেখতে হবে?
             </button>
-            <button class="quick-query-btn" onclick="askQuickQuery('আমার ৪০২ দাগের নামজারি হয়েছে কিনা কীভাবে জানব?')">
-              🔍 দাগ ৪০২ এর নামজারি হয়েছে কিনা?
+            <button class="hud-btn hud-btn-outline" style="text-align: left; justify-content: flex-start;" onclick="runQuickVoiceCommand('দাগ ৪০২ এর নামজারি হয়েছে কিনা?')">
+              🔍 দাগ ৪০২ এর নামজারি যাচাই করুন
             </button>
 
-            <div style="background: #f1f5f9; padding: 12px; border-radius: 8px; font-size: 0.8rem; color: #475569;">
-              <strong>💡 সতর্কবার্তা:</strong> সরকার নির্ধারিত নামজারি ফি মাত্র <strong>১,১৭০ টাকা</strong>। কোনো দালাল বা মধ্যস্বত্বভোগীকে বাড়তি টাকা দেবেন না।
+            <div style="background: rgba(6, 182, 212, 0.08); border: 1px solid var(--border-hud); border-radius: 10px; padding: 14px; font-size: 0.78rem; font-family: var(--font-mono); color: #cbd5e1; margin-top: 10px;">
+              <strong style="color: var(--amber);">⚠️ CITIZEN ADVISORY:</strong><br>
+              Official Ministry mutation fee is strictly <strong>1,170 BDT</strong> (Court fee: 20 + Notice: 50 + Record amendment: 1000 + Khatian copy: 100). Do not pay extortion fees to unauthorized middlemen (*dalals*).
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- TAB 3: MOUZA MAP & GPS OVERLAP CHECKER -->
-    <section id="tab-map" class="tab-content">
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">
-            <h2>Digital Mouza Boundary & GPS Walk Verifier (মৌজা ও সীমানা যাচাই)</h2>
-            <p>Interactive cadastral boundary inspection with real-time GPS encroachment simulation.</p>
+    <!-- MODULE 3: TACTICAL MOUZA RADAR & GPS BOUNDARY WALK -->
+    <section id="panel-map" class="terminal-tab-panel">
+      <div class="hud-card">
+        <div class="hud-card-header">
+          <div class="hud-header-title">
+            <h2>📍 Tactical Mouza Radar &amp; GPS Boundary Sweep (ক্যাডাস্ট্রাল রাডার)</h2>
+            <p>Vector Mouza Sheet #4 overlay with active GPS boundary deviation detector.</p>
           </div>
-          <div style="display: flex; gap: 8px;">
-            <button class="btn btn-secondary" onclick="simulateGpsWalk()">🚶 Simulate GPS Boundary Walk</button>
-            <button class="btn btn-primary" onclick="resetMap()">Reset View</button>
-          </div>
-        </div>
-
-        <div class="map-controls">
-          <div style="display: flex; gap: 10px; align-items: center;">
-            <span style="font-weight: 600; font-size: 0.85rem;">Active Layer:</span>
-            <label><input type="checkbox" checked onchange="toggleLayer('mouza')"> Mouza Cadastral Grid</label>
-            <label><input type="checkbox" checked onchange="toggleLayer('canal')"> Protected Canal (খাল)</label>
-            <label><input type="checkbox" checked onchange="toggleLayer('roads')"> Public Road Reserve</label>
-          </div>
-          <div style="font-size: 0.85rem; color: var(--text-muted);">
-            Location: <strong>Savar, Mouza Baipail, Sheet No. 4</strong>
+          <div style="display: flex; gap: 10px;">
+            <button class="hud-btn hud-btn-primary" onclick="initiateGpsPerimeterSweep()">🛰️ Autonomous GPS Sweep</button>
+            <button class="hud-btn hud-btn-outline" onclick="resetTacticalRadar()">Reset Radar</button>
           </div>
         </div>
 
-        <div class="map-container">
-          <svg class="map-svg" viewBox="0 0 800 450" id="mouza-svg">
-            <!-- Background Terrain -->
-            <rect width="800" height="450" fill="#e2e8f0"></rect>
+        <div class="tactical-viewport">
+          <div class="tactical-grid-overlay"></div>
+          <div class="radar-sweep-beam"></div>
 
-            <!-- Public Road -->
-            <path id="layer-roads" d="M 0 180 Q 400 200 800 170 L 800 210 Q 400 240 0 220 Z" fill="#94a3b8"></path>
-            <text x="40" y="205" fill="#f8fafc" font-size="12" font-weight="bold">Dhaka-Tangail Highway Bypass (সরকারি রাস্তা)</text>
+          <div class="hud-crosshair">
+            <div>GPS_LAT: <span style="color: #fff;">23.99841° N</span></div>
+            <div>GPS_LNG: <span style="color: #fff;">90.25418° E</span></div>
+            <div>CADASTRAL_ZONE: <span style="color: var(--emerald-bright);">BAIPAIL_04</span></div>
+          </div>
+
+          <svg width="100%" height="100%" viewBox="0 0 900 500" style="position: absolute; inset: 0;" id="tactical-svg-canvas">
+            <!-- Road Vector Reserve -->
+            <path d="M 0 190 Q 450 220 900 180 L 900 230 Q 450 270 0 240 Z" fill="#334155" opacity="0.8"></path>
+            <text x="30" y="220" fill="#94a3b8" font-size="12" font-family="monospace">HIGHWAY RESERVE // 120 FT BUFFER</text>
 
             <!-- Protected Canal -->
-            <path id="layer-canal" d="M 220 0 Q 260 220 310 450 L 370 450 Q 320 220 280 0 Z" fill="#67e8f9" opacity="0.8"></path>
-            <text x="280" y="80" fill="#0891b2" font-size="13" font-weight="bold" transform="rotate(75, 280, 80)">Turag Tributary Canal (সরকারি খাল)</text>
+            <path d="M 260 0 Q 300 240 370 500 L 440 500 Q 380 240 340 0 Z" fill="rgba(6, 182, 212, 0.25)" stroke="#06b6d4" stroke-width="2"></path>
+            <text x="330" y="100" fill="#22d3ee" font-size="12" font-family="monospace" transform="rotate(75, 330, 100)">CANAL PROTECTED WATERWAY (সরকারি খাল)</text>
 
             <!-- Cadastral Plots -->
-            <g id="layer-mouza">
-              <!-- Plot 401 -->
-              <polygon points="50,40 210,50 200,160 40,150" class="plot-polygon" onclick="selectPlot(401, 'Md. Rahim Ali', 14.5, 'Normal')" id="plot-401"></polygon>
-              <text x="110" y="105" font-size="14" font-weight="bold" fill="#0f766e">দাগ ৪০১</text>
+            <polygon points="60,40 240,50 230,170 50,160" class="cadastral-plot" id="t-plot-401" onclick="selectTacticalPlot(401, 'Md. Rahim Ali', 14.5, 'NORMAL')"></polygon>
+            <text x="120" y="110" font-size="14" font-weight="bold" fill="#22d3ee" font-family="monospace">DAAG 401</text>
 
-              <!-- Plot 402 (User's Target Plot) -->
-              <polygon points="410,50 620,40 640,160 430,170" class="plot-polygon selected" onclick="selectPlot(402, 'Md Mahadi Hasan Shad', 18.2, 'Verified')" id="plot-402"></polygon>
-              <text x="510" y="110" font-size="14" font-weight="bold" fill="#0f766e">দাগ ৪০২ ⭐</text>
+            <!-- Target Plot 402 -->
+            <polygon points="450,50 690,40 710,170 470,180" class="cadastral-plot locked-target" id="t-plot-402" onclick="selectTacticalPlot(402, 'Md Mahadi Hasan Shad', 18.2, 'LOCKED_TARGET')"></polygon>
+            <text x="560" y="115" font-size="14" font-weight="bold" fill="#f59e0b" font-family="monospace">DAAG 402 ⭐</text>
 
-              <!-- Plot 403 (Neighbor) -->
-              <polygon points="630,40 780,30 790,150 650,160" class="plot-polygon" onclick="selectPlot(403, 'Abdul Karim', 12.0, 'Normal')" id="plot-403"></polygon>
-              <text x="700" y="100" font-size="14" font-weight="bold" fill="#0f766e">দাগ ৪০৩</text>
+            <!-- Neighbor Plot 403 -->
+            <polygon points="700,40 860,30 870,160 720,170" class="cadastral-plot" id="t-plot-403" onclick="selectTacticalPlot(403, 'Abdul Karim', 12.0, 'NEIGHBOR')"></polygon>
+            <text x="760" y="105" font-size="14" font-weight="bold" fill="#22d3ee" font-family="monospace">DAAG 403</text>
 
-              <!-- Plot 404 (Adjacent to Canal) -->
-              <polygon points="120,240 280,250 260,390 90,380" class="plot-polygon" onclick="selectPlot(404, 'Govt Khash Land', 24.0, 'Sensitive Canal Buffer')" id="plot-404"></polygon>
-              <text x="160" y="320" font-size="14" font-weight="bold" fill="#0f766e">দাগ ৪০৪ (খাস)</text>
-
-              <!-- Plot 405 -->
-              <polygon points="420,250 680,240 690,410 430,400" class="plot-polygon" onclick="selectPlot(405, 'Sultana Begum', 21.4, 'Normal')" id="plot-405"></polygon>
-              <text x="540" y="330" font-size="14" font-weight="bold" fill="#0f766e">দাগ ৪০৫</text>
-            </g>
+            <!-- Plot 404 (Khas Wetland) -->
+            <polygon points="140,260 320,270 300,430 110,420" class="cadastral-plot" id="t-plot-404" onclick="selectTacticalPlot(404, 'Govt Khash Wetland', 24.0, 'PROTECTED_WETLAND')"></polygon>
+            <text x="180" y="350" font-size="14" font-weight="bold" fill="#f43f5e" font-family="monospace">DAAG 404 [KHAS]</text>
 
             <!-- Dynamic GPS Path -->
-            <path id="gps-walk-path" d="" fill="none" stroke="#f59e0b" stroke-width="4" stroke-linecap="round"></path>
-            <circle id="gps-walker" cx="-20" cy="-20" r="7" fill="#ef4444" stroke="#ffffff" stroke-width="2"></circle>
+            <path id="tactical-walk-trace" d="" fill="none" stroke="#22d3ee" stroke-width="4" stroke-linecap="round" filter="drop-shadow(0 0 8px #22d3ee)"></path>
+            <circle id="tactical-gps-drone" cx="-30" cy="-30" r="9" fill="#f43f5e" stroke="#ffffff" stroke-width="2.5" filter="drop-shadow(0 0 10px #f43f5e)"></circle>
           </svg>
 
-          <div class="map-overlay-card" id="map-detail-card">
-            <h4 style="font-weight: 700; color: var(--primary-dark); margin-bottom: 4px;" id="map-card-title">দাগ নং: ৪০২ (নির্বাচিত)</h4>
-            <p>মালিক: <strong id="map-card-owner">Md Mahadi Hasan Shad</strong></p>
-            <p>জমির পরিমাণ: <strong id="map-card-area">১৮.২ শতক (Decimal)</strong></p>
-            <p>মৌজা স্থানাঙ্ক: <span style="font-family: monospace;">23.9984° N, 90.2541° E</span></p>
-            <div id="map-overlap-alert" style="display: none; margin-top: 8px; color: var(--danger); font-weight: bold; background: #fee2e2; padding: 6px; border-radius: 6px;">
-              ⚠️ সতর্কবার্তা: পূর্ব সীমানায় ২.৩ ফুট ওভারল্যাপ পাওয়া গেছে!
+          <!-- Tactical HUD Info Card -->
+          <div style="position: absolute; bottom: 20px; left: 20px; background: rgba(3, 7, 18, 0.9); border: 1px solid var(--border-hud); border-radius: 10px; padding: 16px; max-width: 320px; font-family: var(--font-mono); font-size: 0.8rem; box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);" id="tactical-plot-dossier">
+            <div style="color: var(--cyan-bright); font-weight: 700; margin-bottom: 6px;" id="tac-dossier-title">TARGET: DAAG #402</div>
+            <div>RECORDED OWNER: <strong style="color: #fff;" id="tac-dossier-owner">Md Mahadi Hasan Shad</strong></div>
+            <div>REGISTERED AREA: <strong style="color: #fff;" id="tac-dossier-area">18.2 Shotok (Decimal)</strong></div>
+            <div>STATUS: <span class="hud-badge hud-badge-green" id="tac-dossier-status">TITLE_SECURE</span></div>
+            <div id="tac-breach-box" style="display: none; margin-top: 10px; color: var(--rose-bright); background: rgba(244, 63, 94, 0.15); border: 1px solid var(--rose); padding: 8px; border-radius: 6px; font-weight: bold;">
+              🚨 PERIMETER BREACH: 2.4m encroachment into Daag #403!
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- TAB 4: ENCROACHMENT SENTINEL -->
-    <section id="tab-sentinel" class="tab-content">
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">
-            <h2>Encroachment & Wetland Sentinel (ভূমি দখল ও বালু ভরাট পর্যবেক্ষণ)</h2>
-            <p>AI computer vision feed & time-lapse satellite change detector over protected waterbodies.</p>
+    <!-- MODULE 4: SATELLITE SENTINEL & COMPUTER VISION DRONE -->
+    <section id="panel-sentinel" class="terminal-tab-panel">
+      <div class="hud-card">
+        <div class="hud-card-header">
+          <div class="hud-header-title">
+            <h2>🛰️ Satellite &amp; Aerial Computer Vision Sentinel (ভূমি দখল পর্যবেক্ষণ)</h2>
+            <p>Real-time edge neural inference for unauthorized sand filling (বালু ভরাট) and structural encroachment.</p>
           </div>
-          <span class="status-badge status-danger">3 Critical Violations Flagged</span>
+          <span class="hud-badge hud-badge-rose">3 ACTIVE INTERCEPTS</span>
         </div>
 
-        <div class="sentinel-grid">
-          <!-- Live AI Camera Feed Simulation -->
+        <div class="sentinel-dual">
           <div>
-            <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 8px;">🔴 Live Drone / Camera Stream (Turag Canal Sector 4)</h3>
-            <div class="sentinel-feed" style="background: linear-gradient(180deg, #1e293b, #0f172a);">
-              <div class="feed-overlay">
-                <span class="rec-dot"></span>
-                <span>AI SENTINEL ONLINE — FPS: 30 — YOLOv8n</span>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-family: var(--font-mono); font-size: 0.78rem;">
+              <span>OPTICAL SENSOR // TURAG CORRIDOR CAM-04</span>
+              <span style="color: var(--emerald-bright);">INFERENCE: YOLOv8 ONNX (30 FPS)</span>
+            </div>
+
+            <div class="drone-camera-box">
+              <div class="hud-rec-indicator">
+                <span class="ping-dot" style="background: var(--rose); box-shadow: 0 0 10px var(--rose);"></span>
+                <span>REC // SENSOR_ID: UAV-SAVAR-ALPHA</span>
               </div>
 
-              <!-- Visual Representation of Detection -->
-              <svg width="100%" height="100%" viewBox="0 0 400 240">
-                <!-- Water / River Bank -->
-                <path d="M 0 160 Q 200 130 400 150 L 400 240 L 0 240 Z" fill="#0891b2" opacity="0.6"></path>
+              <!-- Vector Drone Landscape -->
+              <svg width="100%" height="100%" viewBox="0 0 450 260">
+                <path d="M 0 170 Q 225 140 450 160 L 450 260 L 0 260 Z" fill="#0891b2" opacity="0.45"></path>
                 <!-- Sand Heap -->
-                <path d="M 120 180 Q 180 120 240 180 Z" fill="#d97706"></path>
-
-                <!-- Truck Shape -->
-                <rect x="230" y="115" width="90" height="45" rx="4" fill="#64748b"></rect>
-                <circle cx="250" cy="162" r="8" fill="#000"></circle>
-                <circle cx="300" cy="162" r="8" fill="#000"></circle>
+                <path d="M 140 190 Q 210 120 280 190 Z" fill="#b45309" opacity="0.8"></path>
+                <!-- Heavy Dump Truck -->
+                <rect x="250" y="125" width="100" height="50" rx="4" fill="#475569"></rect>
+                <circle cx="275" cy="175" r="9" fill="#0f172a" stroke="#94a3b8"></circle>
+                <circle cx="330" cy="175" r="9" fill="#0f172a" stroke="#94a3b8"></circle>
               </svg>
 
-              <!-- AI Bounding Boxes -->
-              <div class="bbox" style="top: 110px; left: 225px; width: 105px; height: 60px;">
-                <span class="bbox-label">Dump Truck / Balu (96%)</span>
+              <!-- Futuristic Holographic Detection Boxes -->
+              <div class="ai-target-box" style="top: 120px; left: 245px; width: 115px; height: 68px;">
+                <span class="ai-target-tag">Heavy Dump Truck [96%]</span>
               </div>
-              <div class="bbox" style="top: 130px; left: 120px; width: 100px; height: 50px; border-color: #f59e0b;">
-                <span class="bbox-label" style="background: #f59e0b;">Illegal Sand Heap (89%)</span>
+              <div class="ai-target-box" style="top: 135px; left: 135px; width: 110px; height: 55px; border-color: var(--amber); box-shadow: 0 0 15px var(--amber-glow);">
+                <span class="ai-target-tag" style="background: var(--amber);">Sand Filling Dump [89%]</span>
               </div>
             </div>
-            <div style="display: flex; justify-content: space-between; margin-top: 8px;">
-              <small style="color: var(--text-muted);">Model: YOLOv8 Threat & Encroachment Weights (ONNX)</small>
-              <button class="btn btn-danger" style="padding: 4px 12px; font-size: 0.8rem;" onclick="alert('Instant alert dispatched to Assistant Commissioner (Land), Savar Upazila Office!')">🚨 Dispatch Alert to AC (Land)</button>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px;">
+              <span style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-dim);">COORDINATES: 23.9981° N, 90.2539° E</span>
+              <button class="hud-btn hud-btn-danger" onclick="playBeep(); alert('Emergency Dispatch Confirmed: Telemetry dossier transmitted to Assistant Commissioner (Land), Savar Office.')">🚨 Transmit Alert to AC (Land)</button>
             </div>
           </div>
 
-          <!-- Incident Alert Log -->
+          <!-- Real-Time Audit Stream Logs -->
           <div>
-            <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 8px;">📋 Real-Time Incident Audit Log</h3>
-            <div class="alert-log-list">
-              <div class="alert-item">
-                <div style="font-weight: 700; color: #991b1b;">⚠️ Unauthorized Sand Filling (বালু ভরাট) Detected</div>
-                <div>Canal Reserve Plot #404, Baipail Mouza. Heavy truck unloading reported.</div>
-                <div class="alert-meta">
-                  <span>Sensor: Cam-Sav-04</span>
-                  <span>12 Oct 2026, 04:12 PM</span>
+            <div style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--cyan-bright); text-transform: uppercase; margin-bottom: 10px;">📋 Live Intercept Log &amp; Audit Trail:</div>
+            
+            <div class="audit-terminal-log">
+              <div class="audit-log-row">
+                <div style="font-weight: 700; color: var(--rose-bright);">⚠️ CRITICAL: Illegal Earth Filling in Canal Reserve</div>
+                <div style="color: #cbd5e1; margin-top: 2px;">Plot #404 (Govt Khash Canal Zone). Dump truck unloading unauthorized sand fill.</div>
+                <div style="display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-dim); margin-top: 6px;">
+                  <span>SENSOR: UAV-SAVAR-04</span>
+                  <span>12 OCT 2026 // 04:12 PM</span>
                 </div>
               </div>
 
-              <div class="alert-item" style="border-left-color: #f59e0b; background: #fffbeb;">
-                <div style="font-weight: 700; color: #92400e;">⚠️ Boundary Wall Construction Inside Wetland Buffer</div>
-                <div>Daag #219 (Wetland category). Bricks and masonry workers detected outside permit zone.</div>
-                <div class="alert-meta">
-                  <span>Sensor: Sentinel-UAV-1</span>
-                  <span>11 Oct 2026, 09:30 AM</span>
+              <div class="audit-log-row warning">
+                <div style="font-weight: 700; color: var(--amber);">⚠️ CAUTION: Unpermitted Boundary Enclosure</div>
+                <div style="color: #cbd5e1; margin-top: 2px;">Daag #219 (Wetland buffer). Structural bricks staged without clearance.</div>
+                <div style="display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-dim); margin-top: 6px;">
+                  <span>SENSOR: SATELLITE-SENTINEL-1</span>
+                  <span>11 OCT 2026 // 09:30 AM</span>
                 </div>
               </div>
 
-              <div class="alert-item" style="border-left-color: #10b981; background: #f0fdf4;">
-                <div style="font-weight: 700; color: #166534;">✅ Encroachment Eviction Verified</div>
-                <div>Plot #105 (Govt Primary School ground). Illegal tin-shed stall removed by local council.</div>
-                <div class="alert-meta">
-                  <span>Status: Resolved</span>
-                  <span>09 Oct 2026, 02:15 PM</span>
+              <div class="audit-log-row resolved">
+                <div style="font-weight: 700; color: var(--emerald-bright);">✅ RESOLVED: Encroachment Removed by AC (Land)</div>
+                <div style="color: #cbd5e1; margin-top: 2px;">Daag #105 (Public reserve). Unauthorized temporary market stalls cleared.</div>
+                <div style="display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-dim); margin-top: 6px;">
+                  <span>OFFICER: SAVAR AC (LAND)</span>
+                  <span>09 OCT 2026 // 02:15 PM</span>
                 </div>
               </div>
             </div>
@@ -1084,44 +1215,51 @@
       </div>
     </section>
 
-    <!-- TAB 5: CITIZEN LOCKER -->
-    <section id="tab-locker" class="tab-content">
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">
-            <h2>Citizen Land Locker (নাগরিক খতিয়ান ভল্ট)</h2>
-            <p>Manage your registered plots, track ongoing mutation files, and receive instant SMS theft alerts.</p>
+    <!-- MODULE 5: CRYPTOGRAPHIC CITIZEN VAULT -->
+    <section id="panel-vault" class="terminal-tab-panel">
+      <div class="hud-card">
+        <div class="hud-card-header">
+          <div class="hud-header-title">
+            <h2>🔐 Cryptographic Citizen Land Vault (নাগরিক খতিয়ান ভল্ট)</h2>
+            <p>Tamper-evident record custody, mutation file progress tracking, and instantaneous anti-theft locks.</p>
           </div>
-          <button class="btn btn-primary" onclick="alert('New plot link form opened.')">+ Link New Khatian</button>
+          <button class="hud-btn hud-btn-primary" onclick="playBeep(); alert('Opening Secure Khatian Link Portal...')">+ Link Digital Khatian</button>
         </div>
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px;">
-          <div style="border: 1px solid var(--border); border-radius: 10px; padding: 16px; background: white;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-              <span style="font-size: 0.8rem; background: var(--primary-light); color: var(--primary-dark); padding: 2px 8px; border-radius: 6px; font-weight: 700;">RS KHATIAN #194</span>
-              <span class="status-badge status-safe">ACTIVE</span>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
+          <!-- Card 1 -->
+          <div style="background: rgba(3, 7, 18, 0.7); border: 1px solid var(--border-hud); border-radius: 12px; padding: 20px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <span class="hud-badge hud-badge-green">RS KHATIAN #194 // VERIFIED</span>
+              <span style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--emerald-bright);">TAMPER-LOCKED 🔒</span>
             </div>
-            <h3 style="font-size: 1.1rem; font-weight: 700;">দাগ নং ৪০২ (Baipail, Savar)</h3>
-            <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">Owner: Md Mahadi Hasan Shad (১৬ আনা)</p>
-            <div style="margin-top: 12px; font-size: 0.85rem; border-top: 1px solid #f1f5f9; padding-top: 10px;">
-              <div>🔔 <strong>Theft Protection:</strong> ON (Instant SMS if mutation applied)</div>
-              <div>📅 <strong>Last Tax Paid:</strong> 1432 BS (Receipt #841029)</div>
+            <h3 style="font-size: 1.15rem; font-weight: 700;">দাগ নং ৪০২ (Baipail, Savar)</h3>
+            <p style="font-size: 0.85rem; color: var(--text-dim); margin-top: 4px;">Primary Owner: <strong>Md Mahadi Hasan Shad (১৬ আনা)</strong></p>
+            
+            <div style="margin-top: 16px; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 12px; font-family: var(--font-mono); font-size: 0.78rem; display: flex; flex-direction: column; gap: 8px;">
+              <div>🛡️ <strong>ANTI-THEFT SENTINEL:</strong> <span style="color: var(--emerald-bright);">ACTIVE (Instant SMS alert)</span></div>
+              <div>📅 <strong>LAST TAX SETTLED:</strong> 1432 BS (Receipt #841029)</div>
+              <div>🔑 <strong>LEDGER HASH:</strong> <code style="color: var(--cyan-bright);">0x7c9b...1f04</code></div>
             </div>
           </div>
 
-          <div style="border: 1px solid var(--border); border-radius: 10px; padding: 16px; background: white;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-              <span style="font-size: 0.8rem; background: #fef3c7; color: #b45309; padding: 2px 8px; border-radius: 6px; font-weight: 700;">MUTATION FILE #NM-2026-89</span>
-              <span class="status-badge status-warning">PROCESSING</span>
+          <!-- Card 2 -->
+          <div style="background: rgba(3, 7, 18, 0.7); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 12px; padding: 20px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <span class="hud-badge hud-badge-amber">MUTATION FILE #NM-2026-89</span>
+              <span style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--amber);">STAGE 3 OF 4</span>
             </div>
-            <h3 style="font-size: 1.1rem; font-weight: 700;">নামজারি আবেদন (দাগ নং ১০৮)</h3>
-            <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">Current Stage: Assistant Commissioner Hearing</p>
-            <div style="margin-top: 12px;">
-              <!-- Progress Bar -->
-              <div style="background: #e2e8f0; height: 8px; border-radius: 9999px; overflow: hidden;">
-                <div style="background: var(--primary); width: 65%; height: 100%;"></div>
+            <h3 style="font-size: 1.15rem; font-weight: 700;">নামজারি আবেদন (দাগ নং ১০৮)</h3>
+            <p style="font-size: 0.85rem; color: var(--text-dim); margin-top: 4px;">Status: Assistant Commissioner Hearing Scheduled</p>
+            
+            <div style="margin-top: 16px;">
+              <div style="background: rgba(255, 255, 255, 0.08); height: 8px; border-radius: 999px; overflow: hidden; margin-bottom: 8px;">
+                <div style="background: linear-gradient(90deg, var(--cyan), var(--emerald)); width: 75%; height: 100%;"></div>
               </div>
-              <small style="color: var(--text-muted); display: block; margin-top: 6px;">Hearing Date: 18 October 2026, Savar AC (Land) Office</small>
+              <div style="display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-dim);">
+                <span>HEARING: 18 OCT 2026</span>
+                <span style="color: var(--cyan-bright);">SAVAR LAND OFFICE</span>
+              </div>
             </div>
           </div>
         </div>
@@ -1131,137 +1269,176 @@
   </main>
 
   <script>
-    // Tab Switching Logic
-    function switchTab(tabId) {
-      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    // Sci-Fi UI Synthesized Sound Effects (AudioContext)
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playBeep(freq = 660, duration = 0.08) {
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + duration);
+    }
 
-      const target = document.getElementById('tab-' + tabId);
+    // Tab Navigation
+    function activateHudTab(tabKey) {
+      playBeep(880, 0.06);
+      document.querySelectorAll('.terminal-tab-panel').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.hud-tab-btn').forEach(el => el.classList.remove('active'));
+
+      const target = document.getElementById('panel-' + tabKey);
       if (target) target.classList.add('active');
 
-      const buttons = document.querySelectorAll('.tab-btn');
-      const tabs = ['score', 'voice', 'map', 'sentinel', 'locker'];
-      const index = tabs.indexOf(tabId);
-      if (index !== -1 && buttons[index]) {
-        buttons[index].classList.add('active');
+      const tabs = ['score', 'voice', 'map', 'sentinel', 'vault'];
+      const idx = tabs.indexOf(tabKey);
+      if (idx !== -1) {
+        document.querySelectorAll('.hud-tab-btn')[idx].classList.add('active');
       }
     }
 
-    // Safety Score Calculation Logic
-    function calculateScore() {
-      const daag = parseInt(document.getElementById('score-daag').value) || 402;
+    // Module 1: Forensic Score Calculator
+    function executeForensicAudit() {
+      playBeep(520, 0.12);
+      const daag = parseInt(document.getElementById('input-daag').value) || 402;
       if (daag === 77) {
-        setScoreUI(28, 'danger', 'HIGH RISK (ঝুঁকিপূর্ণ)', 'DISPUTED', 'INJUNCTION', 'OVERDUE', 'RESTRICTED');
+        applyTelemetryScore(28, 'critical', 'CRITICAL // DISPUTED', 'UNRESOLVED 28%', 'INJUNCTION ACTIVE', 'TAX OVERDUE', 'WETLAND RESTRICTED', '0x1b4c...f098');
       } else if (daag === 108) {
-        setScoreUI(62, 'warning', 'CAUTION (সতর্কতা)', 'VERIFIED', 'CLEAR', '1 YEAR DUE', 'PERMITTED');
+        applyTelemetryScore(62, 'caution', 'CAUTION // VERIFY', 'CONTINUOUS 70%', 'CLEAR', 'TAX 1-YR DUE', 'COMPLIANT', '0x4e8d...a212');
       } else {
-        setScoreUI(94, 'safe', 'SAFE TO BUY (নিরাপদ)', 'VERIFIED', 'CLEAR', 'UP TO DATE', 'PERMITTED');
+        applyTelemetryScore(94, 'safe', 'SAFE // VERIFIED', 'VERIFIED 100%', 'CLEAR', 'CLEARED', 'COMPLIANT', '0x8f2a...c941');
       }
     }
 
-    function setScoreUI(score, statusType, statusText, chain, court, tax, buffer) {
-      const gaugeVal = document.getElementById('gauge-value');
-      const gaugeCircle = document.getElementById('gauge-circle');
-      const statusTextElem = document.getElementById('gauge-status-text');
+    function applyTelemetryScore(score, statusType, statusLabel, lineage, court, tax, buffer, hash) {
+      document.getElementById('hud-score-display').innerText = score;
+      document.getElementById('hud-status-badge').innerText = statusLabel;
+      document.getElementById('telemetry-hash').innerText = hash;
 
-      gaugeVal.innerText = score;
-      statusTextElem.innerText = statusText;
+      const offset = 565 - (565 * score) / 100;
+      const bar = document.getElementById('hud-gauge-bar');
+      bar.style.strokeDashoffset = offset;
 
-      const offset = 440 - (440 * score) / 100;
-      gaugeCircle.style.strokeDashoffset = offset;
+      let color = 'var(--emerald-bright)';
+      let badgeClass = 'hud-badge-green';
 
-      let color = '#10b981';
-      if (statusType === 'warning') color = '#f59e0b';
-      if (statusType === 'danger') color = '#ef4444';
+      if (statusType === 'caution') {
+        color = 'var(--amber)';
+        badgeClass = 'hud-badge-amber';
+      } else if (statusType === 'critical') {
+        color = 'var(--rose-bright)';
+        badgeClass = 'hud-badge-rose';
+      }
 
-      gaugeCircle.style.stroke = color;
-      statusTextElem.style.color = color;
+      bar.style.stroke = color;
+      document.getElementById('hud-status-badge').style.color = color;
+      document.getElementById('hud-status-badge').style.borderColor = color;
 
-      document.getElementById('badge-chain').className = 'status-badge status-' + (chain === 'VERIFIED' ? 'safe' : 'danger');
-      document.getElementById('badge-chain').innerText = chain;
+      document.getElementById('badge-diag-lineage').className = 'hud-badge ' + (lineage.includes('100') ? 'hud-badge-green' : 'hud-badge-rose');
+      document.getElementById('badge-diag-lineage').innerText = lineage;
 
-      document.getElementById('badge-court').className = 'status-badge status-' + (court === 'CLEAR' ? 'safe' : 'danger');
-      document.getElementById('badge-court').innerText = court;
+      document.getElementById('badge-diag-court').className = 'hud-badge ' + (court === 'CLEAR' ? 'hud-badge-green' : 'hud-badge-rose');
+      document.getElementById('badge-diag-court').innerText = court;
 
-      document.getElementById('badge-tax').className = 'status-badge status-' + (tax === 'UP TO DATE' ? 'safe' : 'warning');
-      document.getElementById('badge-tax').innerText = tax;
+      document.getElementById('badge-diag-tax').className = 'hud-badge ' + (tax === 'CLEARED' ? 'hud-badge-green' : 'hud-badge-amber');
+      document.getElementById('badge-diag-tax').innerText = tax;
 
-      document.getElementById('badge-buffer').className = 'status-badge status-' + (buffer === 'PERMITTED' ? 'safe' : 'danger');
-      document.getElementById('badge-buffer').innerText = buffer;
+      document.getElementById('badge-diag-buffer').className = 'hud-badge ' + (buffer === 'COMPLIANT' ? 'hud-badge-green' : 'hud-badge-rose');
+      document.getElementById('badge-diag-buffer').innerText = buffer;
     }
 
-    function loadSamplePlot(daag, khatian, score, status) {
-      document.getElementById('score-daag').value = daag;
-      document.getElementById('score-khatian').value = khatian;
-      calculateScore();
+    function loadTelemetryScenario(daag, khatian, score, state) {
+      document.getElementById('input-daag').value = daag;
+      document.getElementById('input-khatian').value = khatian;
+      executeForensicAudit();
     }
 
-    function resetScoreForm() {
-      document.getElementById('score-daag').value = '';
-      document.getElementById('score-khatian').value = '';
-      setScoreUI(0, 'warning', 'ENTER PLOT', 'UNKNOWN', 'UNKNOWN', 'UNKNOWN', 'UNKNOWN');
+    function resetHudForm() {
+      playBeep(400, 0.08);
+      document.getElementById('input-daag').value = '';
+      document.getElementById('input-khatian').value = '';
+      applyTelemetryScore(0, 'caution', 'AWAITING_INPUT', 'UNKNOWN', 'UNKNOWN', 'UNKNOWN', 'UNKNOWN', '0x0000...0000');
     }
 
-    // Voice Assistant Engine
-    let isListening = false;
-    function toggleSpeech() {
-      const micBtn = document.getElementById('mic-trigger');
-      if (!isListening) {
+    // Module 2: Voice AI Cockpit
+    let isVoiceListening = false;
+    function toggleCyberVoice() {
+      const micBtn = document.getElementById('cyber-mic');
+      const wave = document.getElementById('wave-container');
+
+      if (!isVoiceListening) {
         if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
           const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-          const recognition = new SpeechRecognition();
-          recognition.lang = 'bn-BD';
-          recognition.start();
+          const recog = new SpeechRecognition();
+          recog.lang = 'bn-BD';
+          recog.start();
 
-          micBtn.classList.add('listening');
-          isListening = true;
+          micBtn.classList.add('active-pulse');
+          wave.classList.add('waveform-active');
+          isVoiceListening = true;
+          playBeep(750, 0.1);
 
-          recognition.onresult = function(event) {
+          recog.onresult = function(event) {
             const transcript = event.results[0][0].transcript;
-            document.getElementById('chat-text-input').value = transcript;
-            sendUserMessage();
-            recognition.stop();
-            micBtn.classList.remove('listening');
-            isListening = false;
+            document.getElementById('voice-text-prompt').value = transcript;
+            submitVoiceCommand();
+            recog.stop();
+            micBtn.classList.remove('active-pulse');
+            wave.classList.remove('waveform-active');
+            isVoiceListening = false;
           };
 
-          recognition.onerror = function() {
-            micBtn.classList.remove('listening');
-            isListening = false;
+          recog.onerror = function() {
+            micBtn.classList.remove('active-pulse');
+            wave.classList.remove('waveform-active');
+            isVoiceListening = false;
           };
         } else {
           alert('Speech Recognition not supported in this browser. Please type your query in the box.');
         }
       } else {
-        micBtn.classList.remove('listening');
-        isListening = false;
+        micBtn.classList.remove('active-pulse');
+        wave.classList.remove('waveform-active');
+        isVoiceListening = false;
       }
     }
 
-    function speakBangla(text) {
+    function synthesizeBangla(text) {
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'bn-BD';
+        utterance.pitch = 1.05;
+        utterance.rate = 0.95;
         window.speechSynthesis.speak(utterance);
       }
     }
 
-    function askQuickQuery(text) {
-      document.getElementById('chat-text-input').value = text;
-      sendUserMessage();
+    function runQuickVoiceCommand(query) {
+      document.getElementById('voice-text-prompt').value = query;
+      submitVoiceCommand();
     }
 
-    function sendUserMessage() {
-      const input = document.getElementById('chat-text-input');
+    function submitVoiceCommand() {
+      const input = document.getElementById('voice-text-prompt');
       const text = input.value.trim();
       if (!text) return;
 
-      appendChatMessage(text, 'user');
+      appendVoiceCard(text, 'user');
       input.value = '';
+      playBeep(640, 0.08);
+
+      const wave = document.getElementById('wave-container');
+      wave.classList.add('waveform-active');
 
       setTimeout(() => {
-        let reply = "ধন্যবাদ। আপনার প্রশ্নটি পেয়েছি। বিষয়টি ভূমি রেকর্ড সার্ভারে যাচাই করা হচ্ছে।";
+        let reply = "ধন্যবাদ। আপনার জিজ্ঞাসাটি সার্ভারে প্রসেস করা হয়েছে।";
         if (text.includes("ফি") || text.includes("টাকা")) {
           reply = "নামজারির সরকারি নির্ধারিত ফি মোট ১,১৭০ টাকা (কোর্ট ফি ২০ + নোটিশ ফি ৫০ + রেকর্ড সংশোধন ১০০০ + খতিয়ান ফি ১০০)। এর চেয়ে বেশি কাউকে দেবেন না।";
         } else if (text.includes("ওয়ারিশ") || text.includes("ভাগ")) {
@@ -1272,86 +1449,84 @@
           reply = "দাগ নং ৪০২ এর নামজারি সম্পন্ন হয়েছে। খতিয়ান নং ১৯৪ প্রস্তুত আছে। কোনো মামলা বা সরকারি নিষেধাজ্ঞা নেই।";
         }
 
-        appendChatMessage(reply, 'bot');
-        speakBangla(reply);
+        appendVoiceCard(reply, 'ai');
+        synthesizeBangla(reply);
+        wave.classList.remove('waveform-active');
       }, 500);
     }
 
-    function appendChatMessage(msg, sender) {
-      const container = document.getElementById('chat-stream');
-      const div = document.createElement('div');
-      div.className = 'chat-msg ' + sender;
-      div.innerHTML = msg;
-      container.appendChild(div);
-      container.scrollTop = container.scrollHeight;
+    function appendVoiceCard(txt, origin) {
+      const feed = document.getElementById('voice-chat-feed');
+      const msg = document.createElement('div');
+      msg.className = 'voice-msg ' + origin;
+      msg.innerHTML = txt;
+      feed.appendChild(msg);
+      feed.scrollTop = feed.scrollHeight;
     }
 
-    // Map Interactivity
-    function selectPlot(num, owner, area, status) {
-      document.querySelectorAll('.plot-polygon').forEach(p => p.classList.remove('selected'));
-      const target = document.getElementById('plot-' + num);
-      if (target) target.classList.add('selected');
+    // Module 3: Tactical Cadastral Radar Logic
+    function selectTacticalPlot(num, owner, area, mode) {
+      playBeep(600, 0.06);
+      document.querySelectorAll('.cadastral-plot').forEach(p => p.classList.remove('locked-target'));
+      const target = document.getElementById('t-plot-' + num);
+      if (target) target.classList.add('locked-target');
 
-      document.getElementById('map-card-title').innerText = 'দাগ নং: ' + num + ' (নির্বাচিত)';
-      document.getElementById('map-card-owner').innerText = owner;
-      document.getElementById('map-card-area').innerText = area + ' শতক (Decimal)';
-      document.getElementById('map-overlap-alert').style.display = (num === 403 || status === 'Overlap') ? 'block' : 'none';
+      document.getElementById('tac-dossier-title').innerText = 'TARGET: DAAG #' + num;
+      document.getElementById('tac-dossier-owner').innerText = owner;
+      document.getElementById('tac-dossier-area').innerText = area + ' Shotok (Decimal)';
+      document.getElementById('tac-breach-box').style.display = (mode === 'BREACH' || num === 403) ? 'block' : 'none';
     }
 
-    function simulateGpsWalk() {
-      const walker = document.getElementById('gps-walker');
-      const walkPath = document.getElementById('gps-walk-path');
-      const overlapAlert = document.getElementById('map-overlap-alert');
+    function initiateGpsPerimeterSweep() {
+      playBeep(880, 0.1);
+      const drone = document.getElementById('tactical-gps-drone');
+      const trace = document.getElementById('tactical-walk-trace');
+      const breachBox = document.getElementById('tac-breach-box');
 
-      // GPS Points around Plot 402 with encroachment into 403
-      const points = [
-        {x: 410, y: 50},
-        {x: 620, y: 40},
-        {x: 660, y: 90}, // Overlap point into 403
-        {x: 640, y: 160},
-        {x: 430, y: 170},
-        {x: 410, y: 50}
+      const waypoints = [
+        {x: 450, y: 50},
+        {x: 690, y: 40},
+        {x: 740, y: 95}, // Breach waypoint inside 403
+        {x: 710, y: 170},
+        {x: 470, y: 180},
+        {x: 450, y: 50}
       ];
 
-      let step = 0;
-      let dStr = `M ${points[0].x} ${points[0].y}`;
-      walkPath.setAttribute('d', dStr);
+      let idx = 0;
+      let pathString = `M ${waypoints[0].x} ${waypoints[0].y}`;
+      trace.setAttribute('d', pathString);
 
-      const interval = setInterval(() => {
-        step++;
-        if (step >= points.length) {
-          clearInterval(interval);
-          overlapAlert.style.display = 'block';
-          overlapAlert.innerHTML = '🚨 জিপিএস সীমানা যাচাই সম্পন্ন: দাগ ৪০৩ এর ভেতর ২.৪ মিটার ওভারল্যাপ চিহ্নিত হয়েছে!';
-          document.getElementById('plot-402').classList.add('plot-overlap');
+      const timer = setInterval(() => {
+        idx++;
+        playBeep(500 + idx * 60, 0.04);
+        if (idx >= waypoints.length) {
+          clearInterval(timer);
+          breachBox.style.display = 'block';
+          breachBox.innerHTML = '🚨 PERIMETER DEVIATION DETECTED: 2.4m encroachment into Daag #403!';
+          document.getElementById('t-plot-402').classList.add('breach-alert');
+          playBeep(320, 0.3);
           return;
         }
 
-        walker.setAttribute('cx', points[step].x);
-        walker.setAttribute('cy', points[step].y);
-        dStr += ` L ${points[step].x} ${points[step].y}`;
-        walkPath.setAttribute('d', dStr);
-      }, 400);
+        drone.setAttribute('cx', waypoints[idx].x);
+        drone.setAttribute('cy', waypoints[idx].y);
+        pathString += ` L ${waypoints[idx].x} ${waypoints[idx].y}`;
+        trace.setAttribute('d', pathString);
+      }, 350);
     }
 
-    function resetMap() {
-      document.getElementById('gps-walk-path').setAttribute('d', '');
-      document.getElementById('gps-walker').setAttribute('cx', '-20');
-      document.getElementById('gps-walker').setAttribute('cy', '-20');
-      document.getElementById('plot-402').classList.remove('plot-overlap');
-      document.getElementById('map-overlap-alert').style.display = 'none';
-      selectPlot(402, 'Md Mahadi Hasan Shad', 18.2, 'Verified');
+    function resetTacticalRadar() {
+      playBeep(450, 0.08);
+      document.getElementById('tactical-walk-trace').setAttribute('d', '');
+      document.getElementById('tactical-gps-drone').setAttribute('cx', '-30');
+      document.getElementById('tactical-gps-drone').setAttribute('cy', '-30');
+      document.getElementById('t-plot-402').classList.remove('breach-alert');
+      document.getElementById('tac-breach-box').style.display = 'none';
+      selectTacticalPlot(402, 'Md Mahadi Hasan Shad', 18.2, 'LOCKED_TARGET');
     }
 
-    function toggleLayer(layerId) {
-      const elem = document.getElementById('layer-' + layerId);
-      if (elem) {
-        elem.style.display = elem.style.display === 'none' ? 'block' : 'none';
-      }
-    }
-
-    // Initialize default score
-    calculateScore();
+    // Initialize Audit Engine
+    executeForensicAudit();
   </script>
 </body>
 </html>
