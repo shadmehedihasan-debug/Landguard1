@@ -1,0 +1,1357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LandGuard BD (ভূমিগার্ড) - Smart Land Governance Platform</title>
+  <style>
+    :root {
+      --primary: #0f766e;
+      --primary-dark: #115e59;
+      --primary-light: #ccfbf1;
+      --accent: #f59e0b;
+      --danger: #ef4444;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding-bottom: 60px;
+    }
+
+    /* Top Banner & Header */
+    .top-badge-bar {
+      background: linear-gradient(90deg, #134e4a, #0f766e);
+      color: #e6fffa;
+      padding: 8px 16px;
+      font-size: 0.85rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .badge-pill {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 2px 10px;
+      border-radius: 9999px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    header {
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      background: var(--primary);
+      color: white;
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      font-weight: bold;
+    }
+
+    .brand-title h1 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--primary-dark);
+      line-height: 1.2;
+    }
+
+    .brand-title p {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    /* Tab Navigation */
+    .nav-tabs {
+      display: flex;
+      gap: 6px;
+      background: #f1f5f9;
+      padding: 4px;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      padding: 8px 14px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+
+    .tab-btn:hover {
+      color: var(--primary-dark);
+    }
+
+    .tab-btn.active {
+      background: var(--card-bg);
+      color: var(--primary);
+      box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+    }
+
+    /* Main Container */
+    .main-container {
+      max-width: 1200px;
+      margin: 24px auto;
+      padding: 0 16px;
+    }
+
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.25s ease-in-out;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Common Card Styles */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 18px;
+      border-bottom: 1px solid #f1f5f9;
+      padding-bottom: 12px;
+    }
+
+    .card-title h2 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .card-title p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* Form Controls */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-control:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.15);
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn-secondary {
+      background: #f1f5f9;
+      color: var(--text);
+    }
+
+    .btn-secondary:hover {
+      background: #e2e8f0;
+    }
+
+    .btn-danger {
+      background: #fee2e2;
+      color: var(--danger);
+      border: 1px solid #fca5a5;
+    }
+
+    /* Sample Selector Pill */
+    .sample-chips {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .chip {
+      background: #f1f5f9;
+      border: 1px solid var(--border);
+      padding: 4px 12px;
+      border-radius: 9999px;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-weight: 500;
+    }
+
+    .chip:hover {
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      border-color: var(--primary);
+    }
+
+    /* Safety Score Gauge Display */
+    .score-layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 24px;
+      align-items: center;
+      background: #f8fafc;
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+
+    @media (max-width: 768px) {
+      .score-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .gauge-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .gauge-svg {
+      width: 170px;
+      height: 170px;
+      transform: rotate(-90deg);
+    }
+
+    .gauge-bg {
+      fill: none;
+      stroke: #e2e8f0;
+      stroke-width: 14;
+    }
+
+    .gauge-progress {
+      fill: none;
+      stroke-width: 14;
+      stroke-linecap: round;
+      stroke-dasharray: 440;
+      stroke-dashoffset: 440;
+      transition: stroke-dashoffset 1s ease-in-out, stroke 0.4s;
+    }
+
+    .gauge-text {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .gauge-number {
+      font-size: 2.4rem;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .gauge-label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-top: 4px;
+    }
+
+    .metrics-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .metric-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      background: white;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .metric-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .status-badge {
+      padding: 3px 10px;
+      border-radius: 9999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .status-safe {
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    .status-warning {
+      background: #fef3c7;
+      color: #b45309;
+    }
+
+    .status-danger {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    /* Voice Bot Layout */
+    .bot-container {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 20px;
+    }
+
+    @media (max-width: 860px) {
+      .bot-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .chat-window {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      height: 440px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .chat-messages {
+      flex: 1;
+      padding: 16px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .chat-msg {
+      max-width: 80%;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 0.92rem;
+      line-height: 1.4;
+    }
+
+    .chat-msg.bot {
+      background: white;
+      border: 1px solid var(--border);
+      align-self: flex-start;
+      border-bottom-left-radius: 2px;
+    }
+
+    .chat-msg.user {
+      background: var(--primary);
+      color: white;
+      align-self: flex-end;
+      border-bottom-right-radius: 2px;
+    }
+
+    .chat-input-bar {
+      padding: 12px;
+      background: white;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .mic-button {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: white;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+
+    .mic-button.listening {
+      background: var(--danger);
+      animation: pulse 1.2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6); }
+      70% { box-shadow: 0 0 0 16px rgba(239, 68, 68, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+
+    .guidance-panel {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .guidance-panel h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+    }
+
+    .quick-query-btn {
+      text-align: left;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      color: var(--text);
+      transition: all 0.15s;
+    }
+
+    .quick-query-btn:hover {
+      background: var(--primary-light);
+      border-color: var(--primary);
+      color: var(--primary-dark);
+    }
+
+    /* Map & Boundary Module */
+    .map-controls {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .map-container {
+      position: relative;
+      background: #e2e8f0;
+      border-radius: 12px;
+      border: 2px solid var(--border);
+      height: 480px;
+      overflow: hidden;
+    }
+
+    .map-svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .plot-polygon {
+      fill: rgba(15, 118, 110, 0.15);
+      stroke: #0f766e;
+      stroke-width: 2;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .plot-polygon:hover {
+      fill: rgba(15, 118, 110, 0.4);
+      stroke-width: 3;
+    }
+
+    .plot-polygon.selected {
+      fill: rgba(245, 158, 11, 0.35);
+      stroke: #d97706;
+      stroke-width: 3.5;
+    }
+
+    .plot-overlap {
+      fill: rgba(239, 68, 68, 0.4) !important;
+      stroke: #dc2626 !important;
+      stroke-dasharray: 5,5;
+      animation: dash 1s linear infinite;
+    }
+
+    @keyframes dash {
+      to { stroke-dashoffset: -10; }
+    }
+
+    .map-overlay-card {
+      position: absolute;
+      bottom: 16px;
+      left: 16px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      box-shadow: var(--shadow-lg);
+      max-width: 300px;
+      font-size: 0.85rem;
+    }
+
+    /* Sentinel Module (Slider & Camera) */
+    .sentinel-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 860px) {
+      .sentinel-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .sentinel-feed {
+      position: relative;
+      background: #000;
+      border-radius: 12px;
+      height: 340px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+    }
+
+    .feed-overlay {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-family: monospace;
+    }
+
+    .rec-dot {
+      width: 8px;
+      height: 8px;
+      background: #ef4444;
+      border-radius: 50%;
+      animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+
+    .bbox {
+      position: absolute;
+      border: 2px solid #ef4444;
+      background: rgba(239, 68, 68, 0.15);
+      border-radius: 4px;
+      pointer-events: none;
+    }
+
+    .bbox-label {
+      position: absolute;
+      top: -22px;
+      left: -2px;
+      background: #ef4444;
+      color: white;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 3px;
+      white-space: nowrap;
+    }
+
+    .alert-log-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 280px;
+      overflow-y: auto;
+    }
+
+    .alert-item {
+      padding: 10px 14px;
+      border-radius: 8px;
+      border-left: 4px solid var(--danger);
+      background: #fef2f2;
+      font-size: 0.85rem;
+    }
+
+    .alert-meta {
+      display: flex;
+      justify-content: space-between;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      margin-top: 4px;
+    }
+
+    /* Modal */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal-backdrop.show {
+      display: flex;
+    }
+
+    .modal-box {
+      background: white;
+      border-radius: 14px;
+      max-width: 600px;
+      width: 100%;
+      padding: 24px;
+      box-shadow: var(--shadow-lg);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Competition Badge -->
+  <div class="top-badge-bar">
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <span class="badge-pill">DIU LANDTECH 2026</span>
+      <span>Track: <strong>Land Tech Software</strong></span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <span>Team: <strong>BUG X HUNTER</strong> (Code: <code>LA-193</code>)</span>
+      <span class="badge-pill">Savvy E-Governance MVP</span>
+    </div>
+  </div>
+
+  <!-- Header & Navigation -->
+  <header>
+    <div class="brand">
+      <div class="brand-icon">🛡️</div>
+      <div class="brand-title">
+        <h1>LandGuard BD (ভূমিগার্ড)</h1>
+        <p>Smart Land Governance & Anti-Fraud Citizen Platform</p>
+      </div>
+    </div>
+
+    <nav class="nav-tabs">
+      <button class="tab-btn active" onclick="switchTab('score')">🛡️ Safety Score</button>
+      <button class="tab-btn" onclick="switchTab('voice')">🎙️ Gramin AI</button>
+      <button class="tab-btn" onclick="switchTab('map')">📍 Mouza Map</button>
+      <button class="tab-btn" onclick="switchTab('sentinel')">🛰️ Sentinel</button>
+      <button class="tab-btn" onclick="switchTab('locker')">📋 Citizen Locker</button>
+    </nav>
+  </header>
+
+  <!-- Main Application Body -->
+  <main class="main-container">
+
+    <!-- TAB 1: LAND SAFETY SCORE -->
+    <section id="tab-score" class="tab-content active">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <h2>Pre-Purchase Land Safety Meter (ভূমি নিরাপত্তা যাচাই)</h2>
+            <p>Verify ownership chain, court litigation, mutation status, and zoning buffer before transactions.</p>
+          </div>
+          <button class="btn btn-secondary" onclick="resetScoreForm()">Clear Form</button>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Division</label>
+            <select class="form-control" id="score-division">
+              <option value="Dhaka">Dhaka (ঢাকা)</option>
+              <option value="Chattogram">Chattogram</option>
+              <option value="Rajshahi">Rajshahi</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>District / Upazila</label>
+            <input type="text" class="form-control" id="score-district" value="Dhaka / Savar">
+          </div>
+          <div class="form-group">
+            <label>Mouza Name</label>
+            <input type="text" class="form-control" id="score-mouza" value="Baipail (JL-42)">
+          </div>
+          <div class="form-group">
+            <label>Daag (Plot) No.</label>
+            <input type="number" class="form-control" id="score-daag" value="402">
+          </div>
+          <div class="form-group">
+            <label>Khatian No.</label>
+            <input type="number" class="form-control" id="score-khatian" value="194">
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+          <button class="btn btn-primary" onclick="calculateScore()">🔍 Run Deep Land Audit</button>
+          <div class="sample-chips">
+            <span>Quick Sample Plots:</span>
+            <span class="chip" onclick="loadSamplePlot(402, 194, 94, 'safe')">Plot 402 (Clean 94)</span>
+            <span class="chip" onclick="loadSamplePlot(108, 312, 62, 'warning')">Plot 108 (Caution 62)</span>
+            <span class="chip" onclick="loadSamplePlot(77, 88, 28, 'danger')">Plot 77 (High Risk 28)</span>
+          </div>
+        </div>
+
+        <!-- Score Results Section -->
+        <div style="margin-top: 24px;" id="score-result-container">
+          <div class="score-layout">
+            <div class="gauge-wrapper">
+              <div style="position: relative; display: flex; align-items: center; justify-content: center;">
+                <svg class="gauge-svg" viewBox="0 0 160 160">
+                  <circle class="gauge-bg" cx="80" cy="80" r="70"></circle>
+                  <circle class="gauge-progress" id="gauge-circle" cx="80" cy="80" r="70"></circle>
+                </svg>
+                <div class="gauge-text">
+                  <span class="gauge-number" id="gauge-value">94</span>
+                  <span class="gauge-label" id="gauge-status-text" style="color: #10b981;">SAFE TO BUY</span>
+                </div>
+              </div>
+              <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 10px;">Audit ID: LG-DH-2026-402</p>
+            </div>
+
+            <div class="metrics-list">
+              <div class="metric-row">
+                <div class="metric-info">
+                  <span>📜</span>
+                  <div>
+                    <div>Chain of Title Continuity (CS → SA → RS → BS)</div>
+                    <small style="color: var(--text-muted);" id="metric-chain-desc">Complete legal pedigree registered.</small>
+                  </div>
+                </div>
+                <span class="status-badge status-safe" id="badge-chain">VERIFIED</span>
+              </div>
+
+              <div class="metric-row">
+                <div class="metric-info">
+                  <span>⚖️</span>
+                  <div>
+                    <div>Civil Court Litigation & Injunction Search</div>
+                    <small style="color: var(--text-muted);" id="metric-court-desc">Zero stay orders or pending title suits.</small>
+                  </div>
+                </div>
+                <span class="status-badge status-safe" id="badge-court">CLEAR</span>
+              </div>
+
+              <div class="metric-row">
+                <div class="metric-info">
+                  <span>💵</span>
+                  <div>
+                    <div>Land Tax (Khajna) Clearance</div>
+                    <small style="color: var(--text-muted);" id="metric-tax-desc">Paid up to current fiscal year (1432 BS).</small>
+                  </div>
+                </div>
+                <span class="status-badge status-safe" id="badge-tax">UP TO DATE</span>
+              </div>
+
+              <div class="metric-row">
+                <div class="metric-info">
+                  <span>🚧</span>
+                  <div>
+                    <div>Government Masterplan & Wetland Buffer</div>
+                    <small style="color: var(--text-muted);" id="metric-buffer-desc">Not inside RAJUK canal or highway zone.</small>
+                  </div>
+                </div>
+                <span class="status-badge status-safe" id="badge-buffer">PERMITTED</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
+            <button class="btn btn-secondary" onclick="alert('Downloading Certified PDF Land Verification Sheet for Daag #' + document.getElementById('score-daag').value)">📄 Download Certified Audit PDF</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: GRAMIN LAND AI (VOICE BOT) -->
+    <section id="tab-voice" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <h2>Gramin Land AI (গ্রামীণ ল্যান্ড ভয়েস সহকারী)</h2>
+            <p>Voice-assisted land counseling for rural citizens and farmers to prevent middleman exploitation.</p>
+          </div>
+          <span class="status-badge status-safe">🎙️ Audio Engine Ready</span>
+        </div>
+
+        <div class="bot-container">
+          <div class="chat-window">
+            <div class="chat-messages" id="chat-stream">
+              <div class="chat-msg bot">
+                👋 <strong>আসসালামু আলাইকুম!</strong> আমি LandGuard এর গ্রামীণ সহকারী। আপনার জমি, নামজারি (Mutation), সরকারি ফি বা খতিয়ান সংক্রান্ত যেকোনো প্রশ্ন মুখে বলুন বা নিচের অপশনগুলো থেকে বেছে নিন।
+              </div>
+            </div>
+
+            <div class="chat-input-bar">
+              <button class="mic-button" id="mic-trigger" onclick="toggleSpeech()" title="Click to Speak">🎙️</button>
+              <input type="text" class="form-control" id="chat-text-input" placeholder="মুখে বলুন অথবা এখানে লিখুন (বাংলা/English)..." onkeydown="if(event.key==='Enter') sendUserMessage()">
+              <button class="btn btn-primary" onclick="sendUserMessage()">পাঠান</button>
+            </div>
+          </div>
+
+          <div class="guidance-panel">
+            <h3>জনপ্রিয় সাধারণ প্রশ্নসমূহ</h3>
+            <button class="quick-query-btn" onclick="askQuickQuery('নামজারি করতে সরকারি ফি কত?')">
+              💰 নামজারি করতে সরকারি ফি কত?
+            </button>
+            <button class="quick-query-btn" onclick="askQuickQuery('ওয়ারিশ সূত্রে জমি ভাগ করার নিয়ম কী?')">
+              👨‍👩‍👧‍👦 ওয়ারিশ সূত্রে জমি ভাগ করার নিয়ম কী?
+            </button>
+            <button class="quick-query-btn" onclick="askQuickQuery('জমি কেনার আগে কোন কোন কাগজ দেখতে হবে?')">
+              📑 জমি কেনার আগে কোন কাগজ দেখতে হবে?
+            </button>
+            <button class="quick-query-btn" onclick="askQuickQuery('আমার ৪০২ দাগের নামজারি হয়েছে কিনা কীভাবে জানব?')">
+              🔍 দাগ ৪০২ এর নামজারি হয়েছে কিনা?
+            </button>
+
+            <div style="background: #f1f5f9; padding: 12px; border-radius: 8px; font-size: 0.8rem; color: #475569;">
+              <strong>💡 সতর্কবার্তা:</strong> সরকার নির্ধারিত নামজারি ফি মাত্র <strong>১,১৭০ টাকা</strong>। কোনো দালাল বা মধ্যস্বত্বভোগীকে বাড়তি টাকা দেবেন না।
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: MOUZA MAP & GPS OVERLAP CHECKER -->
+    <section id="tab-map" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <h2>Digital Mouza Boundary & GPS Walk Verifier (মৌজা ও সীমানা যাচাই)</h2>
+            <p>Interactive cadastral boundary inspection with real-time GPS encroachment simulation.</p>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn btn-secondary" onclick="simulateGpsWalk()">🚶 Simulate GPS Boundary Walk</button>
+            <button class="btn btn-primary" onclick="resetMap()">Reset View</button>
+          </div>
+        </div>
+
+        <div class="map-controls">
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <span style="font-weight: 600; font-size: 0.85rem;">Active Layer:</span>
+            <label><input type="checkbox" checked onchange="toggleLayer('mouza')"> Mouza Cadastral Grid</label>
+            <label><input type="checkbox" checked onchange="toggleLayer('canal')"> Protected Canal (খাল)</label>
+            <label><input type="checkbox" checked onchange="toggleLayer('roads')"> Public Road Reserve</label>
+          </div>
+          <div style="font-size: 0.85rem; color: var(--text-muted);">
+            Location: <strong>Savar, Mouza Baipail, Sheet No. 4</strong>
+          </div>
+        </div>
+
+        <div class="map-container">
+          <svg class="map-svg" viewBox="0 0 800 450" id="mouza-svg">
+            <!-- Background Terrain -->
+            <rect width="800" height="450" fill="#e2e8f0"></rect>
+
+            <!-- Public Road -->
+            <path id="layer-roads" d="M 0 180 Q 400 200 800 170 L 800 210 Q 400 240 0 220 Z" fill="#94a3b8"></path>
+            <text x="40" y="205" fill="#f8fafc" font-size="12" font-weight="bold">Dhaka-Tangail Highway Bypass (সরকারি রাস্তা)</text>
+
+            <!-- Protected Canal -->
+            <path id="layer-canal" d="M 220 0 Q 260 220 310 450 L 370 450 Q 320 220 280 0 Z" fill="#67e8f9" opacity="0.8"></path>
+            <text x="280" y="80" fill="#0891b2" font-size="13" font-weight="bold" transform="rotate(75, 280, 80)">Turag Tributary Canal (সরকারি খাল)</text>
+
+            <!-- Cadastral Plots -->
+            <g id="layer-mouza">
+              <!-- Plot 401 -->
+              <polygon points="50,40 210,50 200,160 40,150" class="plot-polygon" onclick="selectPlot(401, 'Md. Rahim Ali', 14.5, 'Normal')" id="plot-401"></polygon>
+              <text x="110" y="105" font-size="14" font-weight="bold" fill="#0f766e">দাগ ৪০১</text>
+
+              <!-- Plot 402 (User's Target Plot) -->
+              <polygon points="410,50 620,40 640,160 430,170" class="plot-polygon selected" onclick="selectPlot(402, 'Md Mahadi Hasan Shad', 18.2, 'Verified')" id="plot-402"></polygon>
+              <text x="510" y="110" font-size="14" font-weight="bold" fill="#0f766e">দাগ ৪০২ ⭐</text>
+
+              <!-- Plot 403 (Neighbor) -->
+              <polygon points="630,40 780,30 790,150 650,160" class="plot-polygon" onclick="selectPlot(403, 'Abdul Karim', 12.0, 'Normal')" id="plot-403"></polygon>
+              <text x="700" y="100" font-size="14" font-weight="bold" fill="#0f766e">দাগ ৪০৩</text>
+
+              <!-- Plot 404 (Adjacent to Canal) -->
+              <polygon points="120,240 280,250 260,390 90,380" class="plot-polygon" onclick="selectPlot(404, 'Govt Khash Land', 24.0, 'Sensitive Canal Buffer')" id="plot-404"></polygon>
+              <text x="160" y="320" font-size="14" font-weight="bold" fill="#0f766e">দাগ ৪০৪ (খাস)</text>
+
+              <!-- Plot 405 -->
+              <polygon points="420,250 680,240 690,410 430,400" class="plot-polygon" onclick="selectPlot(405, 'Sultana Begum', 21.4, 'Normal')" id="plot-405"></polygon>
+              <text x="540" y="330" font-size="14" font-weight="bold" fill="#0f766e">দাগ ৪০৫</text>
+            </g>
+
+            <!-- Dynamic GPS Path -->
+            <path id="gps-walk-path" d="" fill="none" stroke="#f59e0b" stroke-width="4" stroke-linecap="round"></path>
+            <circle id="gps-walker" cx="-20" cy="-20" r="7" fill="#ef4444" stroke="#ffffff" stroke-width="2"></circle>
+          </svg>
+
+          <div class="map-overlay-card" id="map-detail-card">
+            <h4 style="font-weight: 700; color: var(--primary-dark); margin-bottom: 4px;" id="map-card-title">দাগ নং: ৪০২ (নির্বাচিত)</h4>
+            <p>মালিক: <strong id="map-card-owner">Md Mahadi Hasan Shad</strong></p>
+            <p>জমির পরিমাণ: <strong id="map-card-area">১৮.২ শতক (Decimal)</strong></p>
+            <p>মৌজা স্থানাঙ্ক: <span style="font-family: monospace;">23.9984° N, 90.2541° E</span></p>
+            <div id="map-overlap-alert" style="display: none; margin-top: 8px; color: var(--danger); font-weight: bold; background: #fee2e2; padding: 6px; border-radius: 6px;">
+              ⚠️ সতর্কবার্তা: পূর্ব সীমানায় ২.৩ ফুট ওভারল্যাপ পাওয়া গেছে!
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: ENCROACHMENT SENTINEL -->
+    <section id="tab-sentinel" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <h2>Encroachment & Wetland Sentinel (ভূমি দখল ও বালু ভরাট পর্যবেক্ষণ)</h2>
+            <p>AI computer vision feed & time-lapse satellite change detector over protected waterbodies.</p>
+          </div>
+          <span class="status-badge status-danger">3 Critical Violations Flagged</span>
+        </div>
+
+        <div class="sentinel-grid">
+          <!-- Live AI Camera Feed Simulation -->
+          <div>
+            <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 8px;">🔴 Live Drone / Camera Stream (Turag Canal Sector 4)</h3>
+            <div class="sentinel-feed" style="background: linear-gradient(180deg, #1e293b, #0f172a);">
+              <div class="feed-overlay">
+                <span class="rec-dot"></span>
+                <span>AI SENTINEL ONLINE — FPS: 30 — YOLOv8n</span>
+              </div>
+
+              <!-- Visual Representation of Detection -->
+              <svg width="100%" height="100%" viewBox="0 0 400 240">
+                <!-- Water / River Bank -->
+                <path d="M 0 160 Q 200 130 400 150 L 400 240 L 0 240 Z" fill="#0891b2" opacity="0.6"></path>
+                <!-- Sand Heap -->
+                <path d="M 120 180 Q 180 120 240 180 Z" fill="#d97706"></path>
+
+                <!-- Truck Shape -->
+                <rect x="230" y="115" width="90" height="45" rx="4" fill="#64748b"></rect>
+                <circle cx="250" cy="162" r="8" fill="#000"></circle>
+                <circle cx="300" cy="162" r="8" fill="#000"></circle>
+              </svg>
+
+              <!-- AI Bounding Boxes -->
+              <div class="bbox" style="top: 110px; left: 225px; width: 105px; height: 60px;">
+                <span class="bbox-label">Dump Truck / Balu (96%)</span>
+              </div>
+              <div class="bbox" style="top: 130px; left: 120px; width: 100px; height: 50px; border-color: #f59e0b;">
+                <span class="bbox-label" style="background: #f59e0b;">Illegal Sand Heap (89%)</span>
+              </div>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-top: 8px;">
+              <small style="color: var(--text-muted);">Model: YOLOv8 Threat & Encroachment Weights (ONNX)</small>
+              <button class="btn btn-danger" style="padding: 4px 12px; font-size: 0.8rem;" onclick="alert('Instant alert dispatched to Assistant Commissioner (Land), Savar Upazila Office!')">🚨 Dispatch Alert to AC (Land)</button>
+            </div>
+          </div>
+
+          <!-- Incident Alert Log -->
+          <div>
+            <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 8px;">📋 Real-Time Incident Audit Log</h3>
+            <div class="alert-log-list">
+              <div class="alert-item">
+                <div style="font-weight: 700; color: #991b1b;">⚠️ Unauthorized Sand Filling (বালু ভরাট) Detected</div>
+                <div>Canal Reserve Plot #404, Baipail Mouza. Heavy truck unloading reported.</div>
+                <div class="alert-meta">
+                  <span>Sensor: Cam-Sav-04</span>
+                  <span>12 Oct 2026, 04:12 PM</span>
+                </div>
+              </div>
+
+              <div class="alert-item" style="border-left-color: #f59e0b; background: #fffbeb;">
+                <div style="font-weight: 700; color: #92400e;">⚠️ Boundary Wall Construction Inside Wetland Buffer</div>
+                <div>Daag #219 (Wetland category). Bricks and masonry workers detected outside permit zone.</div>
+                <div class="alert-meta">
+                  <span>Sensor: Sentinel-UAV-1</span>
+                  <span>11 Oct 2026, 09:30 AM</span>
+                </div>
+              </div>
+
+              <div class="alert-item" style="border-left-color: #10b981; background: #f0fdf4;">
+                <div style="font-weight: 700; color: #166534;">✅ Encroachment Eviction Verified</div>
+                <div>Plot #105 (Govt Primary School ground). Illegal tin-shed stall removed by local council.</div>
+                <div class="alert-meta">
+                  <span>Status: Resolved</span>
+                  <span>09 Oct 2026, 02:15 PM</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 5: CITIZEN LOCKER -->
+    <section id="tab-locker" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <h2>Citizen Land Locker (নাগরিক খতিয়ান ভল্ট)</h2>
+            <p>Manage your registered plots, track ongoing mutation files, and receive instant SMS theft alerts.</p>
+          </div>
+          <button class="btn btn-primary" onclick="alert('New plot link form opened.')">+ Link New Khatian</button>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px;">
+          <div style="border: 1px solid var(--border); border-radius: 10px; padding: 16px; background: white;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-size: 0.8rem; background: var(--primary-light); color: var(--primary-dark); padding: 2px 8px; border-radius: 6px; font-weight: 700;">RS KHATIAN #194</span>
+              <span class="status-badge status-safe">ACTIVE</span>
+            </div>
+            <h3 style="font-size: 1.1rem; font-weight: 700;">দাগ নং ৪০২ (Baipail, Savar)</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">Owner: Md Mahadi Hasan Shad (১৬ আনা)</p>
+            <div style="margin-top: 12px; font-size: 0.85rem; border-top: 1px solid #f1f5f9; padding-top: 10px;">
+              <div>🔔 <strong>Theft Protection:</strong> ON (Instant SMS if mutation applied)</div>
+              <div>📅 <strong>Last Tax Paid:</strong> 1432 BS (Receipt #841029)</div>
+            </div>
+          </div>
+
+          <div style="border: 1px solid var(--border); border-radius: 10px; padding: 16px; background: white;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-size: 0.8rem; background: #fef3c7; color: #b45309; padding: 2px 8px; border-radius: 6px; font-weight: 700;">MUTATION FILE #NM-2026-89</span>
+              <span class="status-badge status-warning">PROCESSING</span>
+            </div>
+            <h3 style="font-size: 1.1rem; font-weight: 700;">নামজারি আবেদন (দাগ নং ১০৮)</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">Current Stage: Assistant Commissioner Hearing</p>
+            <div style="margin-top: 12px;">
+              <!-- Progress Bar -->
+              <div style="background: #e2e8f0; height: 8px; border-radius: 9999px; overflow: hidden;">
+                <div style="background: var(--primary); width: 65%; height: 100%;"></div>
+              </div>
+              <small style="color: var(--text-muted); display: block; margin-top: 6px;">Hearing Date: 18 October 2026, Savar AC (Land) Office</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // Tab Switching Logic
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+
+      const target = document.getElementById('tab-' + tabId);
+      if (target) target.classList.add('active');
+
+      const buttons = document.querySelectorAll('.tab-btn');
+      const tabs = ['score', 'voice', 'map', 'sentinel', 'locker'];
+      const index = tabs.indexOf(tabId);
+      if (index !== -1 && buttons[index]) {
+        buttons[index].classList.add('active');
+      }
+    }
+
+    // Safety Score Calculation Logic
+    function calculateScore() {
+      const daag = parseInt(document.getElementById('score-daag').value) || 402;
+      if (daag === 77) {
+        setScoreUI(28, 'danger', 'HIGH RISK (ঝুঁকিপূর্ণ)', 'DISPUTED', 'INJUNCTION', 'OVERDUE', 'RESTRICTED');
+      } else if (daag === 108) {
+        setScoreUI(62, 'warning', 'CAUTION (সতর্কতা)', 'VERIFIED', 'CLEAR', '1 YEAR DUE', 'PERMITTED');
+      } else {
+        setScoreUI(94, 'safe', 'SAFE TO BUY (নিরাপদ)', 'VERIFIED', 'CLEAR', 'UP TO DATE', 'PERMITTED');
+      }
+    }
+
+    function setScoreUI(score, statusType, statusText, chain, court, tax, buffer) {
+      const gaugeVal = document.getElementById('gauge-value');
+      const gaugeCircle = document.getElementById('gauge-circle');
+      const statusTextElem = document.getElementById('gauge-status-text');
+
+      gaugeVal.innerText = score;
+      statusTextElem.innerText = statusText;
+
+      const offset = 440 - (440 * score) / 100;
+      gaugeCircle.style.strokeDashoffset = offset;
+
+      let color = '#10b981';
+      if (statusType === 'warning') color = '#f59e0b';
+      if (statusType === 'danger') color = '#ef4444';
+
+      gaugeCircle.style.stroke = color;
+      statusTextElem.style.color = color;
+
+      document.getElementById('badge-chain').className = 'status-badge status-' + (chain === 'VERIFIED' ? 'safe' : 'danger');
+      document.getElementById('badge-chain').innerText = chain;
+
+      document.getElementById('badge-court').className = 'status-badge status-' + (court === 'CLEAR' ? 'safe' : 'danger');
+      document.getElementById('badge-court').innerText = court;
+
+      document.getElementById('badge-tax').className = 'status-badge status-' + (tax === 'UP TO DATE' ? 'safe' : 'warning');
+      document.getElementById('badge-tax').innerText = tax;
+
+      document.getElementById('badge-buffer').className = 'status-badge status-' + (buffer === 'PERMITTED' ? 'safe' : 'danger');
+      document.getElementById('badge-buffer').innerText = buffer;
+    }
+
+    function loadSamplePlot(daag, khatian, score, status) {
+      document.getElementById('score-daag').value = daag;
+      document.getElementById('score-khatian').value = khatian;
+      calculateScore();
+    }
+
+    function resetScoreForm() {
+      document.getElementById('score-daag').value = '';
+      document.getElementById('score-khatian').value = '';
+      setScoreUI(0, 'warning', 'ENTER PLOT', 'UNKNOWN', 'UNKNOWN', 'UNKNOWN', 'UNKNOWN');
+    }
+
+    // Voice Assistant Engine
+    let isListening = false;
+    function toggleSpeech() {
+      const micBtn = document.getElementById('mic-trigger');
+      if (!isListening) {
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+          const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+          const recognition = new SpeechRecognition();
+          recognition.lang = 'bn-BD';
+          recognition.start();
+
+          micBtn.classList.add('listening');
+          isListening = true;
+
+          recognition.onresult = function(event) {
+            const transcript = event.results[0][0].transcript;
+            document.getElementById('chat-text-input').value = transcript;
+            sendUserMessage();
+            recognition.stop();
+            micBtn.classList.remove('listening');
+            isListening = false;
+          };
+
+          recognition.onerror = function() {
+            micBtn.classList.remove('listening');
+            isListening = false;
+          };
+        } else {
+          alert('Speech Recognition not supported in this browser. Please type your query in the box.');
+        }
+      } else {
+        micBtn.classList.remove('listening');
+        isListening = false;
+      }
+    }
+
+    function speakBangla(text) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'bn-BD';
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+
+    function askQuickQuery(text) {
+      document.getElementById('chat-text-input').value = text;
+      sendUserMessage();
+    }
+
+    function sendUserMessage() {
+      const input = document.getElementById('chat-text-input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      appendChatMessage(text, 'user');
+      input.value = '';
+
+      setTimeout(() => {
+        let reply = "ধন্যবাদ। আপনার প্রশ্নটি পেয়েছি। বিষয়টি ভূমি রেকর্ড সার্ভারে যাচাই করা হচ্ছে।";
+        if (text.includes("ফি") || text.includes("টাকা")) {
+          reply = "নামজারির সরকারি নির্ধারিত ফি মোট ১,১৭০ টাকা (কোর্ট ফি ২০ + নোটিশ ফি ৫০ + রেকর্ড সংশোধন ১০০০ + খতিয়ান ফি ১০০)। এর চেয়ে বেশি কাউকে দেবেন না।";
+        } else if (text.includes("ওয়ারিশ") || text.includes("ভাগ")) {
+          reply = "ওয়ারিশ সূত্রে জমি ভাগ করতে হলে ইউনিয়ন পরিষদ বা পৌরসভা থেকে ওয়ারিশ সনদ সংগ্রহ করে সহকারী কমিশনার (ভূমি) অফিসে নামজারি আবেদন করতে হবে।";
+        } else if (text.includes("কাগজ") || text.includes("কিন")) {
+          reply = "জমি কেনার আগে সিএস, এসএ, আরএস এবং বিএস খতিয়ানের ধারাবাহিকতা, নামজারি পর্চা, দাখিলা (খাজনার রশিদ), এবং রেজিস্ট্রি দলিলের বায়া দলিল যাচাই করা বাধ্যতামূলক।";
+        } else if (text.includes("৪০২") || text.includes("নামজারি")) {
+          reply = "দাগ নং ৪০২ এর নামজারি সম্পন্ন হয়েছে। খতিয়ান নং ১৯৪ প্রস্তুত আছে। কোনো মামলা বা সরকারি নিষেধাজ্ঞা নেই।";
+        }
+
+        appendChatMessage(reply, 'bot');
+        speakBangla(reply);
+      }, 500);
+    }
+
+    function appendChatMessage(msg, sender) {
+      const container = document.getElementById('chat-stream');
+      const div = document.createElement('div');
+      div.className = 'chat-msg ' + sender;
+      div.innerHTML = msg;
+      container.appendChild(div);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    // Map Interactivity
+    function selectPlot(num, owner, area, status) {
+      document.querySelectorAll('.plot-polygon').forEach(p => p.classList.remove('selected'));
+      const target = document.getElementById('plot-' + num);
+      if (target) target.classList.add('selected');
+
+      document.getElementById('map-card-title').innerText = 'দাগ নং: ' + num + ' (নির্বাচিত)';
+      document.getElementById('map-card-owner').innerText = owner;
+      document.getElementById('map-card-area').innerText = area + ' শতক (Decimal)';
+      document.getElementById('map-overlap-alert').style.display = (num === 403 || status === 'Overlap') ? 'block' : 'none';
+    }
+
+    function simulateGpsWalk() {
+      const walker = document.getElementById('gps-walker');
+      const walkPath = document.getElementById('gps-walk-path');
+      const overlapAlert = document.getElementById('map-overlap-alert');
+
+      // GPS Points around Plot 402 with encroachment into 403
+      const points = [
+        {x: 410, y: 50},
+        {x: 620, y: 40},
+        {x: 660, y: 90}, // Overlap point into 403
+        {x: 640, y: 160},
+        {x: 430, y: 170},
+        {x: 410, y: 50}
+      ];
+
+      let step = 0;
+      let dStr = `M ${points[0].x} ${points[0].y}`;
+      walkPath.setAttribute('d', dStr);
+
+      const interval = setInterval(() => {
+        step++;
+        if (step >= points.length) {
+          clearInterval(interval);
+          overlapAlert.style.display = 'block';
+          overlapAlert.innerHTML = '🚨 জিপিএস সীমানা যাচাই সম্পন্ন: দাগ ৪০৩ এর ভেতর ২.৪ মিটার ওভারল্যাপ চিহ্নিত হয়েছে!';
+          document.getElementById('plot-402').classList.add('plot-overlap');
+          return;
+        }
+
+        walker.setAttribute('cx', points[step].x);
+        walker.setAttribute('cy', points[step].y);
+        dStr += ` L ${points[step].x} ${points[step].y}`;
+        walkPath.setAttribute('d', dStr);
+      }, 400);
+    }
+
+    function resetMap() {
+      document.getElementById('gps-walk-path').setAttribute('d', '');
+      document.getElementById('gps-walker').setAttribute('cx', '-20');
+      document.getElementById('gps-walker').setAttribute('cy', '-20');
+      document.getElementById('plot-402').classList.remove('plot-overlap');
+      document.getElementById('map-overlap-alert').style.display = 'none';
+      selectPlot(402, 'Md Mahadi Hasan Shad', 18.2, 'Verified');
+    }
+
+    function toggleLayer(layerId) {
+      const elem = document.getElementById('layer-' + layerId);
+      if (elem) {
+        elem.style.display = elem.style.display === 'none' ? 'block' : 'none';
+      }
+    }
+
+    // Initialize default score
+    calculateScore();
+  </script>
+</body>
+</html>
